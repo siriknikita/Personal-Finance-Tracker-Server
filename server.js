@@ -9,7 +9,7 @@ app.use(cors());
 
 app.use(
     cors({
-        origin: "https://personal-finance-tracker-server.azurewebsites.net/",
+        origin: "https://personal-finance-tracker-server.azurewebsites.net",
         methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
         credentials: true,
     })
