@@ -1,9 +1,19 @@
 const express = require('express');
 const database = require('./database');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const app = express();
 
 app.use(bodyParser.json());
+app.use(cors());
+
+app.use(
+    cors({
+        origin: "https://personal-finance-tracker-server.azurewebsites.net/",
+        methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+        credentials: true,
+    })
+);
 
 const PORT = process.env.PORT || 8080;
 
