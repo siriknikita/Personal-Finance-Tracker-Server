@@ -17,6 +17,10 @@ app.use(
 
 const PORT = process.env.PORT || 8080;
 
+app.get("/", (req, res) => {
+    res.send("Hello World!");
+});
+
 app.post("/api/signup", async (req, res) => {
     const username = req.body.username;
     const email = req.body.email;
