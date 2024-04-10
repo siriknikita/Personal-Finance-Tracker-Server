@@ -114,19 +114,19 @@ async function getTotalSpent(userID) {
     return totalSpentRequest[0].TotalSpent;
 }
 
-async function updateTotalMoneySpentByUserID(userID, amount) {
-    const totalSpentString = await getTotalSpent(userID);
-    const totalSpent = parseFloat(totalSpentString);
-    const updateAmount = parseFloat(amount);
-    const updatedTotalSpent = totalSpent + updateAmount;
-    const [rows] = await connection.query(
-        `UPDATE Users
-        SET TotalSpent = ?
-        WHERE UserID = ?`,
-        [updatedTotalSpent, userID]
-    );
-    return true;
-}
+// async function updateTotalMoneySpentByUserID(userID, amount) {
+//     const totalSpentString = await getTotalSpent(userID);
+//     const totalSpent = parseFloat(totalSpentString);
+//     const updateAmount = parseFloat(amount);
+//     const updatedTotalSpent = totalSpent + updateAmount;
+//     const [rows] = await connection.query(
+//         `UPDATE Users
+//         SET TotalSpent = ?
+//         WHERE UserID = ?`,
+//         [updatedTotalSpent, userID]
+//     );
+//     return true;
+// }
 
 async function updateEmail(currentEmail, newEmail) {
     const [rows] = await connection.query(
@@ -197,7 +197,7 @@ module.exports = {
     addTransaction,
     getTransactionsByID,
     getTotalSpent,
-    updateTotalMoneySpentByUserID,
+    // updateTotalMoneySpentByUserID,
     updateEmail,
     updatePassword,
     updateUsername,

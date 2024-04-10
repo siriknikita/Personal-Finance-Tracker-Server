@@ -142,4 +142,40 @@ app.post("/api/set/goal", async (req, res) => {
     }
 });
 
+app.get("/api/get/transactions/:userID", async (req, res) => {
+    const userID = req.params.userID;
+
+    try {
+        const transactions = await database.getTransactionsByID(userID);
+        res.json({ transactions: transactions });
+    } catch (error) {
+        console.error(`Error getting transactions: ${error}`);
+        res.status(500);
+    }
+});
+
+app.get("/api/get/transactions/moneySpent/:userID", async (req, res) => {
+    const userID = req.params.userID;
+
+    try {
+        const moneySpent = await database.getTransactionMoneyByUserID(userID);
+        res.json({ moneySpent: moneySpent });
+    } catch (error) {
+        console.error(`Error getting total spent: ${error}`);
+        res.status(500);
+    }
+});
+
+app.get("/api/get/transactions/categories/:userID", async (req, res) => {
+    const userID = req.params.userID;
+
+    try {
+        const categories = await database.getTransactionCategoriesByUserID(userID);
+        res.json({ categories: categories });
+    } catch (error) {
+        console.error(`Error getting transaction categories: ${error}`);
+        res.status(500);
+    }
+});
+
 app.listen(PORT, () => { console.log(`Server starts on port ${PORT}...`) });
