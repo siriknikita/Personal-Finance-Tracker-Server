@@ -127,11 +127,12 @@ app.post("/api/update/username", async (req, res) => {
 });
 
 app.post("/api/set/goal", async (req, res) => {
-    const email = req.body.email;
-    const goal = req.body.goal;
+    const userID = req.body.userID;
+    const goalDescription = req.body.goal;
+    const goalDate = req.body.deadline;
 
     try {
-        const response = await database.setGoal(email, goal);
+        const response = await database.addGoal(userID, goalDescription, goalDate);
         if (response) {
             res.json({ message: "Goal set successfully" });
         }
