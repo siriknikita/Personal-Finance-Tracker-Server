@@ -1,4 +1,4 @@
-require("dotenv").config({ path: "./.env" })
+require("dotenv").config();
 const mysql = require('mysql2')
 
 const connection = mysql.createPool({
@@ -15,7 +15,6 @@ async function getUser(email) {
         WHERE Email = ?`,
         [email]
     );
-    console.log(rows[0]);
     return rows[0];
 }
 
@@ -129,6 +128,65 @@ async function updateTotalMoneySpentByUserID(userID, amount) {
     return true;
 }
 
+async function updateEmail(currentEmail, newEmail) {
+    const [rows] = await connection.query(
+        `UPDATE Users
+        SET Email = ?
+        WHERE Email = ?`,
+        [newEmail, currentEmail]
+    );
+    return true;
+}
+
+async function updatePassword(email, currentPassword, newPassword) {
+    const user = await getUser(email);
+    if (user.PasswordHash === currentPassword) {
+        const [rows] = await connection.query(
+            `UPDATE Users
+            SET PasswordHash = ?
+            WHERE Email = ?`,
+            [newPassword, email]
+        );
+        return true;
+    } else {
+        return false;
+    }
+}
+
+async function updateUsername(email, currentUsername, newUsername) {
+    const user = await getUser(email);
+    if (user.Username === currentUsername) {
+        const [rows] = await connection.query(
+            `UPDATE Users
+            SET Username = ?
+            WHERE Email = ?`,
+            [newUsername, email]
+        );
+        return true;
+    } else {
+        return false;
+    }
+}
+
+async function addGoal(userID, description, deadline) {
+    const [rows] = await connection.query(
+        `INSERT INTO Goals (UserID, GoalDescription, Deadline)
+        VALUES (?, ?, ?)`,
+        [userID, description, deadline]
+    );
+    return true;
+}
+
+async function getGoals(userID) {
+    const [rows] = await connection.query(
+        `SELECT *
+        FROM Goals
+        WHERE UserID = ?`,
+        [userID]
+    );
+    return rows;
+}
+
 module.exports = {
     getUser,
     createUser,
@@ -139,5 +197,10 @@ module.exports = {
     addTransaction,
     getTransactionsByID,
     getTotalSpent,
-    updateTotalMoneySpentByUserID
+    updateTotalMoneySpentByUserID,
+    updateEmail,
+    updatePassword,
+    updateUsername,
+    addGoal,
+    getGoals
 };
