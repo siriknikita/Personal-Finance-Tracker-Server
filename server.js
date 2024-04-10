@@ -142,6 +142,18 @@ app.post("/api/set/goal", async (req, res) => {
     }
 });
 
+app.get("/api/get/goals/:userID", async (req, res) => {
+    const userID = req.params.userID;
+
+    try {
+        const goals = await database.getGoals(userID);
+        res.json({ goals: goals });
+    } catch (error) {
+        console.error(`Error getting goals: ${error}`);
+        res.status(500);
+    }
+});
+
 app.get("/api/get/transactions/:userID", async (req, res) => {
     const userID = req.params.userID;
 
