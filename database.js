@@ -58,14 +58,14 @@ async function getUser(email) {
 //     return insertID;
 // }
 
-// async function loginUser(email, password) {
-//     const user = await getUser(email);
-//     if (user.PasswordHash === password) {
-//         return user;
-//     } else {
-//         return null;
-//     }
-// }
+async function loginUser(email, password) {
+    const user = await getUser(email);
+    if (user.passwordHash === password) {
+        return user;
+    } else {
+        return null;
+    }
+}
 
 // function getTransactionCategoriesIDByUserID(userID) {
 //     const [categoriesRequest] = connection.query(
@@ -221,7 +221,7 @@ async function getUser(email) {
 module.exports = {
     getUser,
     // createUser,
-    // loginUser,
+    loginUser,
     // getCategoryNameByID,
     // getTransactionCategoriesByUserID,
     // getTransactionMoneyByUserID,
