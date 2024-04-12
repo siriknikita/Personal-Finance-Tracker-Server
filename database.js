@@ -1,210 +1,237 @@
-const mysql = require('mysql2')
-const fs = require('fs');
+const sql = require("mssql");
 require("dotenv").config();
 
-const connection = mysql.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    ssl: {
-        ca: fs.readFileSync(process.cwd() + '/BaltimoreCyberTrustRoot.crt.pem')
+var config = {
+    user: "finance-tracker-admin",
+    password: "Database-PFT-password",
+    server: "personalfinancetracker-database.database.windows.net",
+    database: "personalfinancetracker",
+    authentication: {
+        type: 'default'
+    },
+    options: {
+        encrypt: true
     }
-}).promise();
+}
 
 async function getUser(email) {
-    const [rows] = await connection.query(
-        `SELECT *
-        FROM Users
-        WHERE Email = ?`,
-        [email]
-    );
-    return rows[0];
-}
-
-async function createUser(username, email, passwordHash) {
-    const [insertID] = await connection.query(
-        `INSERT INTO Users (Username, Email, PasswordHash) 
-        VALUES (?, ?, ?)`,
-        [username, email, passwordHash]
-    );
-    return insertID;
-}
-
-async function loginUser(email, password) {
-    const user = await getUser(email);
-    if (user.PasswordHash === password) {
-        return user;
-    } else {
-        return null;
+    try {
+        let pool = await sql.connect(config);
+        let user = await pool.request()
+            .input('email', sql.VarChar, email)
+            .query(
+                `SELECT *
+                FROM Users
+                WHERE email = @email`
+            );
+        console.log(user);
+    } catch (error) {
+        console.log("Error: " + error);
     }
 }
 
-async function getTransactionCategoriesIDByUserID(userID) {
-    const [categoriesRequest] = await connection.query(
-        `SELECT CategoryID
-        FROM Transactions
-        WHERE UserID = ?`,
-        [userID]
-    );
-    let categoriesID = [];
-    for(let i = 0; i < categoriesRequest.length; i++) {
-        categoriesID.push(categoriesRequest[i].CategoryID);
-    }
-    return categoriesID;
-}
+// function getUser(email) {
+//     var request = new sql.Request();
+//     const response = request.query(
+//         `SELECT *
+//         FROM Users
+//         WHERE email = ?`,
+//         [email],
+//         function (error, recordset) {
+//             if (error) {
+//                 console.log("Error: " + error);
+//             } else {
+//                 console.log(recordset);
+//                 return recordset;
+//             }
+//         }
+//     );
+//     return response;
+// }
 
-async function getCategoryNameByID(categoryID) {
-    const [categoryNameRequest] = await connection.query(
-        `SELECT CategoryName
-        FROM Categories
-        WHERE CategoryID = ?`,
-        [categoryID]
-    );
-    const categoryNameJSON = categoryNameRequest[0];
-    return categoryNameJSON.CategoryName;
-}
+// function createUser(username, email, passwordHash) {
+//     const [insertID] = connection.query(
+//         `INSERT INTO Users (username, email, passwordHash) 
+//         VALUES (?, ?, ?)`,
+//         [username, email, passwordHash]
+//     );
+//     return insertID;
+// }
 
-async function getTransactionCategoriesByUserID(userID) {
-    const categoriesID = await getTransactionCategoriesIDByUserID(userID);
-    let categoriesList = [];
-    for(let i = 0; i < categoriesID.length; i++) {
-        const categoryName = await getCategoryNameByID(categoriesID[i]);
-        categoriesList.push(categoryName);
-    }
-    return categoriesList;
-}
+// async function loginUser(email, password) {
+//     const user = await getUser(email);
+//     if (user.PasswordHash === password) {
+//         return user;
+//     } else {
+//         return null;
+//     }
+// }
 
-async function getTransactionMoneyByUserID(userID) {
-    const [moneySpentObj] = await connection.query(
-        `SELECT Amount
-        FROM Transactions
-        WHERE UserID = (?)`,
-        [userID]
-    );
-    let moneySpent = [];
-    for(let i = 0; i < moneySpentObj.length; i++) {
-        moneySpent.push(moneySpentObj[i].Amount);
-    }
-    return moneySpent;
-}
+// function getTransactionCategoriesIDByUserID(userID) {
+//     const [categoriesRequest] = connection.query(
+//         `SELECT categoryID
+//         FROM Transactions
+//         WHERE userID = ?`,
+//         [userID]
+//     );
+//     let categoriesID = [];
+//     for(let i = 0; i < categoriesRequest.length; i++) {
+//         categoriesID.push(categoriesRequest[i].categoryID);
+//     }
+//     return categoriesID;
+// }
 
-async function addTransaction(userID, amount, categoryID) {
-    const [rows] = await connection.query(
-        `INSERT INTO Transactions (UserID, Amount, CategoryID)
-        VALUES (?, ?, ?);`,
-        [userID, amount, categoryID]
-    );
-    return true;
-}
+// function getCategoryNameByID(categoryID) {
+//     const [categoryNameRequest] = connection.query(
+//         `SELECT categoryName
+//         FROM Categories
+//         WHERE categoryID = ?`,
+//         [categoryID]
+//     );
+//     const categoryNameJSON = categoryNameRequest[0];
+//     return categoryNameJSON.categoryName;
+// }
 
-async function getTransactionsByID(userID) {
-    const [rows] = await connection.query(
-        `SELECT *
-        FROM Transactions
-        WHERE UserID = ?`,
-        [userID]
-    );
-    return rows;
-}
+// function getTransactionCategoriesByUserID(userID) {
+//     const categoriesID = getTransactionCategoriesIDByUserID(userID);
+//     let categoriesList = [];
+//     for(let i = 0; i < categoriesID.length; i++) {
+//         const categoryName = getCategoryNameByID(categoriesID[i]);
+//         categoriesList.push(categoryName);
+//     }
+//     return categoriesList;
+// }
 
-async function getTotalSpent(userID) {
-    const [totalSpentRequest] = await connection.query(
-        `SELECT TotalSpent
-        FROM Users
-        WHERE UserID = (?)`,
-        [userID]
-    );
-    return totalSpentRequest[0].TotalSpent;
-}
+// function getTransactionMoneyByUserID(userID) {
+//     const [moneySpentObj] = connection.query(
+//         `SELECT amount
+//         FROM Transactions
+//         WHERE userID = (?)`,
+//         [userID]
+//     );
+//     let moneySpent = [];
+//     for(let i = 0; i < moneySpentObj.length; i++) {
+//         moneySpent.push(moneySpentObj[i].amount);
+//     }
+//     return moneySpent;
+// }
 
-// async function updateTotalMoneySpentByUserID(userID, amount) {
-//     const totalSpentString = await getTotalSpent(userID);
-//     const totalSpent = parseFloat(totalSpentString);
-//     const updateAmount = parseFloat(amount);
-//     const updatedTotalSpent = totalSpent + updateAmount;
-//     const [rows] = await connection.query(
-//         `UPDATE Users
-//         SET TotalSpent = ?
-//         WHERE UserID = ?`,
-//         [updatedTotalSpent, userID]
+// function addTransaction(userID, amount, categoryID) {
+//     const [rows] = connection.query(
+//         `INSERT INTO Transactions (userID, amount, categoryID)
+//         VALUES (?, ?, ?);`,
+//         [userID, amount, categoryID]
 //     );
 //     return true;
 // }
 
-async function updateEmail(currentEmail, newEmail) {
-    const [rows] = await connection.query(
-        `UPDATE Users
-        SET Email = ?
-        WHERE Email = ?`,
-        [newEmail, currentEmail]
-    );
-    return true;
-}
+// function getTransactionsByID(userID) {
+//     const [rows] = connection.query(
+//         `SELECT *
+//         FROM Transactions
+//         WHERE userID = ?`,
+//         [userID]
+//     );
+//     return rows;
+// }
 
-async function updatePassword(email, currentPassword, newPassword) {
-    const user = await getUser(email);
-    if (user.PasswordHash === currentPassword) {
-        const [rows] = await connection.query(
-            `UPDATE Users
-            SET PasswordHash = ?
-            WHERE Email = ?`,
-            [newPassword, email]
-        );
-        return true;
-    } else {
-        return false;
-    }
-}
+// function getTotalSpent(userID) {
+//     const [totalSpentRequest] = connection.query(
+//         `SELECT totalSpent
+//         FROM Users
+//         WHERE userID = (?)`,
+//         [userID]
+//     );
+//     return totalSpentRequest[0].TotalSpent;
+// }
 
-async function updateUsername(email, currentUsername, newUsername) {
-    const user = await getUser(email);
-    if (user.Username === currentUsername) {
-        const [rows] = await connection.query(
-            `UPDATE Users
-            SET Username = ?
-            WHERE Email = ?`,
-            [newUsername, email]
-        );
-        return true;
-    } else {
-        return false;
-    }
-}
+// // async function updateTotalMoneySpentByUserID(userID, amount) {
+// //     const totalSpentString = await getTotalSpent(userID);
+// //     const totalSpent = parseFloat(totalSpentString);
+// //     const updateAmount = parseFloat(amount);
+// //     const updatedTotalSpent = totalSpent + updateAmount;
+// //     const [rows] = await connection.query(
+// //         `UPDATE Users
+// //         SET TotalSpent = ?
+// //         WHERE UserID = ?`,
+// //         [updatedTotalSpent, userID]
+// //     );
+// //     return true;
+// // }
 
-async function addGoal(userID, description, deadline) {
-    const [rows] = await connection.query(
-        `INSERT INTO Goals (UserID, GoalDescription, Deadline)
-        VALUES (?, ?, ?)`,
-        [userID, description, deadline]
-    );
-    return true;
-}
+// function updateEmail(currentEmail, newEmail) {
+//     const [rows] = connection.query(
+//         `UPDATE Users
+//         SET email = ?
+//         WHERE email = ?`,
+//         [newEmail, currentEmail]
+//     );
+//     return true;
+// }
 
-async function getGoals(userID) {
-    const [rows] = await connection.query(
-        `SELECT *
-        FROM Goals
-        WHERE UserID = ?`,
-        [userID]
-    );
-    return rows;
-}
+// function updatePassword(email, currentPassword, newPassword) {
+//     const user = getUser(email);
+//     if (user.PasswordHash === currentPassword) {
+//         const [rows] = connection.query(
+//             `UPDATE Users
+//             SET passwordHash = ?
+//             WHERE email = ?`,
+//             [newPassword, email]
+//         );
+//         return true;
+//     } else {
+//         return false;
+//     }
+// }
+
+// function updateUsername(email, currentUsername, newUsername) {
+//     const user = getUser(email);
+//     if (user.Username === currentUsername) {
+//         const [rows] = connection.query(
+//             `UPDATE Users
+//             SET username = ?
+//             WHERE email = ?`,
+//             [newUsername, email]
+//         );
+//         return true;
+//     } else {
+//         return false;
+//     }
+// }
+
+// function addGoal(userID, description, deadline) {
+//     const [rows] = connection.query(
+//         `INSERT INTO Goals (userID, goalDescription, deadline)
+//         VALUES (?, ?, ?)`,
+//         [userID, description, deadline]
+//     );
+//     return true;
+// }
+
+// async function getGoals(userID) {
+//     const [rows] = await connection.query(
+//         `SELECT *
+//         FROM Goals
+//         WHERE userID = ?`,
+//         [userID]
+//     );
+//     return rows;
+// }
 
 module.exports = {
     getUser,
-    createUser,
-    loginUser,
-    getCategoryNameByID,
-    getTransactionCategoriesByUserID,
-    getTransactionMoneyByUserID,
-    addTransaction,
-    getTransactionsByID,
-    getTotalSpent,
-    // updateTotalMoneySpentByUserID,
-    updateEmail,
-    updatePassword,
-    updateUsername,
-    addGoal,
-    getGoals
+    // createUser,
+    // loginUser,
+    // getCategoryNameByID,
+    // getTransactionCategoriesByUserID,
+    // getTransactionMoneyByUserID,
+    // addTransaction,
+    // getTransactionsByID,
+    // getTotalSpent,
+    // // updateTotalMoneySpentByUserID,
+    // updateEmail,
+    // updatePassword,
+    // updateUsername,
+    // addGoal,
+    // getGoals
 };

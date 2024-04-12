@@ -1,19 +1,19 @@
 const express = require('express');
 const database = require('./database');
 const bodyParser = require('body-parser');
-const cors = require('cors');
+// const cors = require('cors');
 const app = express();
 
 app.use(bodyParser.json());
 
-app.use(cors());
-app.use(
-    cors({
-        origin: "http://localhost:3000",
-        methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-        credentials: true
-    })
-);
+// app.use(cors());
+// app.use(
+//     cors({
+//         origin: "http://localhost:3000",
+//         methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+//         credentials: true
+//     })
+// );
 
 const PORT = process.env.PORT || 8080;
 
