@@ -21,10 +21,10 @@ app.get("/", (req, res) => {
     res.send("Hello World from server!");
 });
 
-app.post("/api/signup", async (req, res) => {
-    const username = req.body.username;
-    const email = req.body.email;
-    const passwordHash = req.body.passwordHash;
+app.get("/api/signup/:username/:email/:passwordHash", async (req, res) => {
+    const username = req.params.username;
+    const email = req.params.email;
+    const passwordHash = req.params.passwordHash;
 
     try {
         const user = await database.createUser(username, email, passwordHash);
@@ -41,7 +41,6 @@ app.get("/api/login/:email/:passwordHash", async (req, res) => {
 
     try {
         const user = await database.loginUser(email, passwordHash);
-        console.log("Obtained user:\n", user);
         if (!user) {
             res.status(404).json({ user: {}, message: "User not found" });
         }

@@ -1,4 +1,5 @@
 const sql = require("mssql");
+const moment = require("moment");
 require("dotenv").config();
 
 var config = {
@@ -31,33 +32,32 @@ async function getUser(email) {
     }
 }
 
-// function getUser(email) {
-//     var request = new sql.Request();
-//     const response = request.query(
-//         `SELECT *
-//         FROM Users
-//         WHERE email = ?`,
-//         [email],
-//         function (error, recordset) {
-//             if (error) {
-//                 console.log("Error: " + error);
-//             } else {
-//                 console.log(recordset);
-//                 return recordset;
-//             }
-//         }
-//     );
-//     return response;
-// }
-
-// function createUser(username, email, passwordHash) {
-//     const [insertID] = connection.query(
-//         `INSERT INTO Users (username, email, passwordHash) 
-//         VALUES (?, ?, ?)`,
-//         [username, email, passwordHash]
-//     );
-//     return insertID;
-// }
+async function createUser(username, email, passwordHash) {
+    try {
+        let pool = await sql.connect(config);
+        let datetime = moment().format("YYYY-MM-DD HH:mm:ss.zzz") + "000";
+        const user = await getUser(email);
+        if (user) {
+            return "User already exists";
+        }
+        const response = await pool.request()
+            .input('username', sql.VarChar, username)
+            .input('email', sql.VarChar, email)
+            .input('passwordHash', sql.VarChar, passwordHash)
+            .query(
+                `INSERT INTO Users (username, email, passwordHash, registrationDate)
+                VALUES (@username, @email, @passwordHash, '${datetime}')`
+            );
+        if (response.rowsAffected[0] === 1) {
+            const user = await getUser(email);
+            return user;
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.log("[CREATE USER] Error: " + error);
+    }
+}
 
 async function loginUser(email, password) {
     const user = await getUser(email);
@@ -68,171 +68,308 @@ async function loginUser(email, password) {
     }
 }
 
-// function getTransactionCategoriesIDByUserID(userID) {
-//     const [categoriesRequest] = connection.query(
-//         `SELECT categoryID
-//         FROM Transactions
-//         WHERE userID = ?`,
-//         [userID]
-//     );
-//     let categoriesID = [];
-//     for(let i = 0; i < categoriesRequest.length; i++) {
-//         categoriesID.push(categoriesRequest[i].categoryID);
-//     }
-//     return categoriesID;
-// }
+async function getTransactionCategoriesIDByUserID(userID) {
+    try {
+        let pool = await sql.connect(config);
+        let categories = await pool.request()
+            .input('userID', sql.Int, userID)
+            .query(
+                `SELECT categoryID
+                FROM Transactions
+                WHERE userID = @userID`
+            );
+        let categoriesID = [];
+        for (let i = 0; i < categories.recordset.length; i++) {
+            categoriesID.push(categories.recordset[i].categoryID);
+        }
+        return categoriesID;
+    } catch (error) {
+        console.log("[GET TRANSACTION CATEGORIES ID BY USER ID] Error: " + error);
+    }
+}
 
-// function getCategoryNameByID(categoryID) {
-//     const [categoryNameRequest] = connection.query(
-//         `SELECT categoryName
-//         FROM Categories
-//         WHERE categoryID = ?`,
-//         [categoryID]
-//     );
-//     const categoryNameJSON = categoryNameRequest[0];
-//     return categoryNameJSON.categoryName;
-// }
+async function getTransactionCategoriesIDByUserID(userID) {
+    try {
+        let pool = await sql.connect(config);
+        let categories = await pool.request()
+            .input('userID', sql.Int, userID)
+            .query(
+                `SELECT categoryID
+                FROM Transactions
+                WHERE userID = @userID`
+            );
+        let categoriesID = [];
+        for (let i = 0; i < categories.recordset.length; i++) {
+            categoriesID.push(categories.recordset[i].categoryID);
+        }
+        return categoriesID;
+    } catch (error) {
+        console.log("[GET TRANSACTION CATEGORIES ID BY USER ID] Error: " + error);
+    }
+}
 
-// function getTransactionCategoriesByUserID(userID) {
-//     const categoriesID = getTransactionCategoriesIDByUserID(userID);
-//     let categoriesList = [];
-//     for(let i = 0; i < categoriesID.length; i++) {
-//         const categoryName = getCategoryNameByID(categoriesID[i]);
-//         categoriesList.push(categoryName);
-//     }
-//     return categoriesList;
-// }
+async function getTransactionCategoriesIDByUserID(userID) {
+    try {
+        let pool = await sql.connect(config);
+        let categories = await pool.request()
+            .input('userID', sql.Int, userID)
+            .query(
+                `SELECT categoryID
+                FROM Transactions
+                WHERE userID = @userID`
+            );
+        let categoriesID = [];
+        for (let i = 0; i < categories.recordset.length; i++) {
+            categoriesID.push(categories.recordset[i].categoryID);
+        }
+        return categoriesID;
+    } catch (error) {
+        console.log("[GET TRANSACTION CATEGORIES ID BY USER ID] Error: " + error);
+    }
+}
 
-// function getTransactionMoneyByUserID(userID) {
-//     const [moneySpentObj] = connection.query(
-//         `SELECT amount
-//         FROM Transactions
-//         WHERE userID = (?)`,
-//         [userID]
-//     );
-//     let moneySpent = [];
-//     for(let i = 0; i < moneySpentObj.length; i++) {
-//         moneySpent.push(moneySpentObj[i].amount);
-//     }
-//     return moneySpent;
-// }
+async function getCategoryNameByID(categoryID) {
+    try {
+        let pool = await sql.connect(config);
+        let categoryName = await pool.request()
+            .input('categoryID', sql.Int, categoryID)
+            .query(
+                `SELECT categoryName
+                FROM Categories
+                WHERE categoryID = @categoryID`
+            );
+        return categoryName.recordset[0].categoryName;
+    } catch (error) {
+        console.log("[GET CATEGORY NAME BY ID] Error: " + error);
+    }
+}
 
-// function addTransaction(userID, amount, categoryID) {
-//     const [rows] = connection.query(
-//         `INSERT INTO Transactions (userID, amount, categoryID)
-//         VALUES (?, ?, ?);`,
-//         [userID, amount, categoryID]
-//     );
-//     return true;
-// }
+async function getTransactionCategoriesByUserID(userID) {
+    const categoriesID = await getTransactionCategoriesIDByUserID(userID);
+    let categoriesList = [];
+    for (let i = 0; i < categoriesID.length; i++) {
+        const categoryName = await getCategoryNameByID(categoriesID[i]);
+        categoriesList.push(categoryName);
+    }
+    return categoriesList;
+}
 
-// function getTransactionsByID(userID) {
-//     const [rows] = connection.query(
-//         `SELECT *
-//         FROM Transactions
-//         WHERE userID = ?`,
-//         [userID]
-//     );
-//     return rows;
-// }
+async function getTransactionMoneyByUserID(userID) {
+    try {
+        let pool = await sql.connect(config);
+        let moneySpent = await pool.request()
+            .input('userID', sql.Int, userID)
+            .query(
+                `SELECT amount
+                FROM Transactions
+                WHERE userID = @userID`
+            );
+        let moneySpentList = [];
+        for (let i = 0; i < moneySpent.recordset.length; i++) {
+            moneySpentList.push(moneySpent.recordset[i].amount);
+        }
+        return moneySpentList;
+    } catch (error) {
+        console.log("[GET TRANSACTION MONEY BY USER ID] Error: " + error);
+    }
+}
 
-// function getTotalSpent(userID) {
-//     const [totalSpentRequest] = connection.query(
-//         `SELECT totalSpent
-//         FROM Users
-//         WHERE userID = (?)`,
-//         [userID]
-//     );
-//     return totalSpentRequest[0].TotalSpent;
-// }
+async function addTransaction(userID, amount, categoryID) {
+    try {
+        let pool = await sql.connect(config);
+        let response = await pool.request()
+            .input('userID', sql.Int, userID)
+            .input('amount', sql.Decimal, amount)
+            .input('categoryID', sql.Int, categoryID)
+            .query(
+                `INSERT INTO Transactions (userID, amount, categoryID)
+                VALUES (@userID, @amount, @categoryID)`
+            );
+        if (response.rowsAffected[0] === 1) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (error) {
+        console.log("[ADD TRANSACTION] Error: " + error);
+    }
+}
 
-// // async function updateTotalMoneySpentByUserID(userID, amount) {
-// //     const totalSpentString = await getTotalSpent(userID);
-// //     const totalSpent = parseFloat(totalSpentString);
-// //     const updateAmount = parseFloat(amount);
-// //     const updatedTotalSpent = totalSpent + updateAmount;
-// //     const [rows] = await connection.query(
-// //         `UPDATE Users
-// //         SET TotalSpent = ?
-// //         WHERE UserID = ?`,
-// //         [updatedTotalSpent, userID]
-// //     );
-// //     return true;
-// // }
+async function getTransactionsByID(userID) {
+    try {
+        let pool = await sql.connect(config);
+        let transactions = await pool.request()
+            .input('userID', sql.Int, userID)
+            .query(
+                `SELECT *
+                FROM Transactions
+                WHERE userID = @userID`
+            );
+        return transactions.recordset;
+    } catch (error) {
+        console.log("[GET TRANSACTIONS BY ID] Error: " + error);
+    }
+}
 
-// function updateEmail(currentEmail, newEmail) {
-//     const [rows] = connection.query(
-//         `UPDATE Users
-//         SET email = ?
-//         WHERE email = ?`,
-//         [newEmail, currentEmail]
-//     );
-//     return true;
-// }
+async function getTotalSpent(userID) {
+    try {
+        let pool = await sql.connect(config);
+        let totalSpent = await pool.request()
+            .input('userID', sql.Int, userID)
+            .query(
+                `SELECT totalSpent
+                FROM Users
+                WHERE userID = @userID`
+            );
+        return totalSpent.recordset[0].totalSpent;
+    } catch (error) {
+        console.log("[GET TOTAL SPENT] Error: " + error);
+    }
+}
 
-// function updatePassword(email, currentPassword, newPassword) {
-//     const user = getUser(email);
-//     if (user.PasswordHash === currentPassword) {
-//         const [rows] = connection.query(
-//             `UPDATE Users
-//             SET passwordHash = ?
-//             WHERE email = ?`,
-//             [newPassword, email]
-//         );
-//         return true;
-//     } else {
-//         return false;
-//     }
-// }
+async function updateTotalMoneySpentByUserID(userID, amount) {
+    try {
+        let totalSpent = await getTotalSpent(userID);
+        let updateAmount = parseFloat(amount);
+        let updatedTotalSpent = totalSpent + updateAmount;
+        let pool = await sql.connect(config);
+        let response = await pool.request()
+            .input('updatedTotalSpent', sql.Decimal, updatedTotalSpent)
+            .input('userID', sql.Int, userID)
+            .query(
+                `UPDATE Users
+                SET totalSpent = @updatedTotalSpent
+                WHERE userID = @userID`
+            );
+        if (response.rowsAffected[0] === 1) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (error) {
+        console.log("[UPDATE TOTAL SPENT BY USER ID] Error: " + error);
+    }
+}
 
-// function updateUsername(email, currentUsername, newUsername) {
-//     const user = getUser(email);
-//     if (user.Username === currentUsername) {
-//         const [rows] = connection.query(
-//             `UPDATE Users
-//             SET username = ?
-//             WHERE email = ?`,
-//             [newUsername, email]
-//         );
-//         return true;
-//     } else {
-//         return false;
-//     }
-// }
+async function updateEmail(currentEmail, newEmail) {
+    try {
+        let pool = await sql.connect(config);
+        let response = await pool.request()
+            .input('newEmail', sql.VarChar, newEmail)
+            .input('currentEmail', sql.VarChar, currentEmail)
+            .query(
+                `UPDATE Users
+                SET email = @newEmail
+                WHERE email = @currentEmail`
+            );
+        if (response.rowsAffected[0] === 1) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (error) {
+        console.log("[UPDATE EMAIL] Error: " + error);
+    }
+}
 
-// function addGoal(userID, description, deadline) {
-//     const [rows] = connection.query(
-//         `INSERT INTO Goals (userID, goalDescription, deadline)
-//         VALUES (?, ?, ?)`,
-//         [userID, description, deadline]
-//     );
-//     return true;
-// }
+async function updatePassword(email, newPassword) {
+    try {
+        let pool = await sql.connect(config);
+        let response = await pool.request()
+            .input('newPassword', sql.VarChar, newPassword)
+            .input('email', sql.VarChar, email)
+            .query(
+                `UPDATE Users
+                SET passwordHash = @newPassword
+                WHERE email = @email`
+            );
+        if (response.rowsAffected[0] === 1) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (error) {
+        console.log("[UPDATE PASSWORD] Error: " + error);
+    }
+}
 
-// async function getGoals(userID) {
-//     const [rows] = await connection.query(
-//         `SELECT *
-//         FROM Goals
-//         WHERE userID = ?`,
-//         [userID]
-//     );
-//     return rows;
-// }
+async function updateUsername(email, currentUsername, newUsername) {
+    try {
+        let pool = await sql.connect(config);
+        let user = await getUser(email);
+        if (user.username === currentUsername) {
+            let response = await pool.request()
+                .input('newUsername', sql.VarChar, newUsername)
+                .input('email', sql.VarChar, email)
+                .query(
+                    `UPDATE Users
+                    SET username = @newUsername
+                    WHERE email = @email`
+                );
+            if (response.rowsAffected[0] === 1) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    } catch (error) {
+        console.log("[UPDATE USERNAME] Error: " + error);
+    }
+}
+
+async function addGoal(userID, description, deadline) {
+    try {
+        let pool = await sql.connect(config);
+        let response = await pool.request()
+            .input('userID', sql.Int, userID)
+            .input('description', sql.VarChar, description)
+            .input('deadline', sql.Date, deadline)
+            .query(
+                `INSERT INTO Goals (userID, goalDescription, deadline)
+                VALUES (@userID, @description, @deadline)`
+            );
+        if (response.rowsAffected[0] === 1) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (error) {
+        console.log("[ADD GOAL] Error: " + error);
+    }
+}
+
+async function getGoals(userID) {
+    try {
+        let pool = await sql.connect(config);
+        let goals = await pool.request()
+            .input('userID', sql.Int, userID)
+            .query(
+                `SELECT *
+                FROM Goals
+                WHERE userID = @userID`
+            );
+        return goals.recordset;
+    } catch (error) {
+        console.log("[GET GOALS] Error: " + error);
+    }
+}
 
 module.exports = {
     getUser,
-    // createUser,
+    createUser,
     loginUser,
-    // getCategoryNameByID,
-    // getTransactionCategoriesByUserID,
-    // getTransactionMoneyByUserID,
-    // addTransaction,
-    // getTransactionsByID,
-    // getTotalSpent,
-    // // updateTotalMoneySpentByUserID,
-    // updateEmail,
-    // updatePassword,
-    // updateUsername,
-    // addGoal,
-    // getGoals
+    getCategoryNameByID,
+    getTransactionCategoriesByUserID,
+    getTransactionMoneyByUserID,
+    addTransaction,
+    getTransactionsByID,
+    getTotalSpent,
+    updateTotalMoneySpentByUserID,
+    updateEmail,
+    updatePassword,
+    updateUsername,
+    addGoal,
+    getGoals
 };
