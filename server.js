@@ -41,7 +41,7 @@ app.get("/api/login/:email/:passwordHash", async (req, res) => {
 
     try {
         const user = await database.loginUser(email, passwordHash);
-        console.log("Message:", user);
+        console.log("Obtained user:\n", user);
         if (!user) {
             res.status(404).json({ user: {}, message: "User not found" });
         }

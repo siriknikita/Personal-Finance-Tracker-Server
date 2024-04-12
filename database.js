@@ -5,7 +5,7 @@ var config = {
     user: "finance-tracker-admin",
     password: "Database-PFT-password",
     server: "personalfinancetracker-database.database.windows.net",
-    database: "personalfinancetracker",
+    database: "personalfinancetrcker",
     authentication: {
         type: 'default'
     },
@@ -24,7 +24,8 @@ async function getUser(email) {
                 FROM Users
                 WHERE email = @email`
             );
-        console.log(user);
+        console.log(user.recordset[0]);
+        return user.recordset[0];
     } catch (error) {
         console.log("Error: " + error);
     }
