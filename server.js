@@ -1,19 +1,19 @@
 const express = require('express');
 const database = require('./database');
 const bodyParser = require('body-parser');
-// const cors = require('cors');
+const cors = require('cors');
 const app = express();
 
 app.use(bodyParser.json());
 
-// app.use(cors());
-// app.use(
-//     cors({
-//         origin: "http://localhost:3000",
-//         methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-//         credentials: true
-//     })
-// );
+app.use(cors());
+app.use(
+    cors({
+        origin: "http://localhost:3000",
+        methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+        credentials: true
+    })
+);
 
 const PORT = process.env.PORT || 8080;
 
@@ -59,22 +59,6 @@ app.get("/api/get/user/:email", async (req, res) => {
         res.json({ user: user });
     } catch (error) {
         console.error(`Error getting a user: ${error}`);
-        res.status(500);
-    }
-});
-
-app.post("/api/add/transaction", async (req, res) => {
-    const userID = req.body.userID;
-    const amount = req.body.amount;
-    const categoryID = req.body.categoryID;
-
-    try {
-        const response = await database.addTransaction(userID, amount, categoryID);
-        if (response) {
-            res.json({ message: "Transaction added successfully" });
-        }
-    } catch (error) {
-        console.error(`Error adding transaction: ${error}`);
         res.status(500);
     }
 });
@@ -149,6 +133,22 @@ app.get("/api/get/goals/:userID", async (req, res) => {
         res.json({ goals: goals });
     } catch (error) {
         console.error(`Error getting goals: ${error}`);
+        res.status(500);
+    }
+});
+
+app.post("/api/add/transaction", async (req, res) => {
+    const userID = req.body.userID;
+    const amount = req.body.amount;
+    const categoryID = req.body.categoryID;
+
+    try {
+        const response = await database.addTransaction(userID, amount, categoryID);
+        if (response) {
+            res.json({ message: "Transaction added successfully" });
+        }
+    } catch (error) {
+        console.error(`Error adding transaction: ${error}`);
         res.status(500);
     }
 });

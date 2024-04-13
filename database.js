@@ -25,7 +25,6 @@ async function getUser(email) {
                 FROM Users
                 WHERE email = @email`
             );
-        console.log(user.recordset[0]);
         return user.recordset[0];
     } catch (error) {
         console.log("Error: " + error);
@@ -45,8 +44,8 @@ async function createUser(username, email, passwordHash) {
             .input('email', sql.VarChar, email)
             .input('passwordHash', sql.VarChar, passwordHash)
             .query(
-                `INSERT INTO Users (username, email, passwordHash, registrationDate)
-                VALUES (@username, @email, @passwordHash, '${datetime}')`
+                `INSERT INTO Users (username, email, passwordHash, registrationDate, isAuthorized)
+                VALUES (@username, @email, @passwordHash, '${datetime}', 1)`
             );
         if (response.rowsAffected[0] === 1) {
             const user = await getUser(email);
@@ -62,7 +61,18 @@ async function createUser(username, email, passwordHash) {
 async function loginUser(email, password) {
     const user = await getUser(email);
     if (user.passwordHash === password) {
-        return user;
+        try {
+            let pool = await sql.connect(config);
+            await pool.request()
+                .query(
+                    `UPDATE Users
+                    SET isAuthorized = 1
+                    WHERE email = '${email}'`
+                );
+            return user;
+        } catch (error) {
+            console.log("[LOGIN USER] Error: " + error);
+        }
     } else {
         return null;
     }
@@ -134,11 +144,11 @@ async function getCategoryNameByID(categoryID) {
         let categoryName = await pool.request()
             .input('categoryID', sql.Int, categoryID)
             .query(
-                `SELECT categoryName
+                `SELECT name
                 FROM Categories
-                WHERE categoryID = @categoryID`
+                WHERE id = @categoryID`
             );
-        return categoryName.recordset[0].categoryName;
+        return categoryName.recordset[0].name;
     } catch (error) {
         console.log("[GET CATEGORY NAME BY ID] Error: " + error);
     }
@@ -179,11 +189,11 @@ async function addTransaction(userID, amount, categoryID) {
         let pool = await sql.connect(config);
         let response = await pool.request()
             .input('userID', sql.Int, userID)
-            .input('amount', sql.Decimal, amount)
             .input('categoryID', sql.Int, categoryID)
+            .input('amount', sql.Decimal, amount)
             .query(
-                `INSERT INTO Transactions (userID, amount, categoryID)
-                VALUES (@userID, @amount, @categoryID)`
+                `INSERT INTO Transactions (userID, categoryID, amount)
+                VALUES (@userID, @categoryID, @amount)`
             );
         if (response.rowsAffected[0] === 1) {
             return true;
@@ -196,6 +206,7 @@ async function addTransaction(userID, amount, categoryID) {
 }
 
 async function getTransactionsByID(userID) {
+    console.log("[GET TRANSACTIONS BY ID] userID: " + userID);
     try {
         let pool = await sql.connect(config);
         let transactions = await pool.request()
@@ -327,7 +338,7 @@ async function addGoal(userID, description, deadline) {
             .input('description', sql.VarChar, description)
             .input('deadline', sql.Date, deadline)
             .query(
-                `INSERT INTO Goals (userID, goalDescription, deadline)
+                `INSERT INTO Goals (userID, description, deadline)
                 VALUES (@userID, @description, @deadline)`
             );
         if (response.rowsAffected[0] === 1) {
