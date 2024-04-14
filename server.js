@@ -189,4 +189,16 @@ app.get("/api/get/transactions/categories/:userID", async (req, res) => {
     }
 });
 
+app.get("/api/get/transactions/moneySpentOnEachCategory/:userID", async (req, res) => {
+    const userID = req.params.userID;
+
+    try {
+        const moneySpentOnEachCategory = await database.getMoneySpentOnEachCategory(userID);
+        res.json({ moneySpentOnEachCategory: moneySpentOnEachCategory });
+    } catch (error) {
+        console.error(`Error getting money spent on each category: ${error}`);
+        res.status(500);
+    }
+});
+
 app.listen(PORT, () => { console.log(`Server starts on port ${PORT}...`) });
