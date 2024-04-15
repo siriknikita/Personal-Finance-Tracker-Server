@@ -194,7 +194,7 @@ app.get("/api/get/transactions/moneySpentOnEachCategory/:userID", async (req, re
 
     try {
         const moneySpentOnEachCategory = await database.getMoneySpentOnEachCategory(userID);
-        res.json({ moneySpentOnEachCategory: moneySpentOnEachCategory });
+        res.json({ data: moneySpentOnEachCategory });
     } catch (error) {
         console.error(`Error getting money spent on each category: ${error}`);
         res.status(500);
