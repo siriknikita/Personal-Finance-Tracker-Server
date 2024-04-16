@@ -39,19 +39,27 @@ app.get("/api/signup/:username/:email/:passwordHash", async (req, res) => {
     }
 });
 
-app.get("/api/login/:email/:passwordHash", async (req, res) => {
+app.get("/api/login/:email/:password", async (req, res) => {
     const email = req.params.email;
     const password = req.params.passwordHash;
 
     try {
-        const user = await database.loginUser(email, password);
+        const user = await database.getUserByEmail(email);
         if (!user) {
-            res.status(404).json({ user: {}, message: "User not found" });
+            return res
+                .status(404)
+                .json({ user: {}, message: "User not found" });
         }
-        res.json({ user: user });
+
+        const passwordMatch = await bcrypt.compare(password, user.passwordHash);
+        if (passwordMatch) {
+            return res.json({ user: user });
+        } else {
+            return res.status(401).json({ message: "Incorrect password" });
+        }
     } catch (error) {
         console.error(`Error logging in: ${error}`);
-        res.status(500).json({ message: `Error logging in: ${error}` });
+        return res.status(500).json({ message: `Error logging in: ${error}` });
     }
 });
 
