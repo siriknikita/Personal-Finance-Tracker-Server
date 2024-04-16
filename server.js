@@ -1,6 +1,7 @@
 const express = require("express");
 const database = require("./database");
 const bodyParser = require("body-parser");
+const bcrypt = require("bcrypt");
 const cors = require("cors");
 const app = express();
 
@@ -24,9 +25,12 @@ app.get("/", (req, res) => {
 app.get("/api/signup/:username/:email/:passwordHash", async (req, res) => {
     const username = req.params.username;
     const email = req.params.email;
-    const passwordHash = req.params.passwordHash;
+    const password = req.params.passwordHash;
 
     try {
+        const salt = await bcrypt.genSalt(10);
+        const passwordHash = await bcrypt.hash(password, salt);
+
         const user = await database.createUser(username, email, passwordHash);
         res.json({ user: user });
     } catch (error) {
@@ -37,10 +41,10 @@ app.get("/api/signup/:username/:email/:passwordHash", async (req, res) => {
 
 app.get("/api/login/:email/:passwordHash", async (req, res) => {
     const email = req.params.email;
-    const passwordHash = req.params.passwordHash;
+    const password = req.params.passwordHash;
 
     try {
-        const user = await database.loginUser(email, passwordHash);
+        const user = await database.loginUser(email, password);
         if (!user) {
             res.status(404).json({ user: {}, message: "User not found" });
         }
