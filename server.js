@@ -1,7 +1,7 @@
-const express = require('express');
-const database = require('./database');
-const bodyParser = require('body-parser');
-const cors = require('cors');
+const express = require("express");
+const database = require("./database");
+const bodyParser = require("body-parser");
+const cors = require("cors");
 const app = express();
 
 app.use(bodyParser.json());
@@ -9,9 +9,9 @@ app.use(bodyParser.json());
 app.use(cors());
 app.use(
     cors({
-        origin: "http://localhost:3000",
+        origin: "https://personal-finance-tracker.azurewebsites.net",
         methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-        credentials: true
+        credentials: true,
     })
 );
 
@@ -99,7 +99,11 @@ app.post("/api/update/username", async (req, res) => {
     const newUsername = req.body.newUsername;
 
     try {
-        const response = await database.updateUsername(email, currentUsername, newUsername);
+        const response = await database.updateUsername(
+            email,
+            currentUsername,
+            newUsername
+        );
         if (response) {
             res.json({ message: "Username updated successfully" });
         }
@@ -115,7 +119,11 @@ app.post("/api/set/goal", async (req, res) => {
     const goalDate = req.body.deadline;
 
     try {
-        const response = await database.addGoal(userID, goalDescription, goalDate);
+        const response = await database.addGoal(
+            userID,
+            goalDescription,
+            goalDate
+        );
         if (response) {
             res.json({ message: "Goal set successfully" });
         }
@@ -143,7 +151,11 @@ app.post("/api/add/transaction", async (req, res) => {
     const categoryID = req.body.categoryID;
 
     try {
-        const response = await database.addTransaction(userID, amount, categoryID);
+        const response = await database.addTransaction(
+            userID,
+            amount,
+            categoryID
+        );
         if (response) {
             res.json({ message: "Transaction added successfully" });
         }
@@ -181,7 +193,9 @@ app.get("/api/get/transactions/categories/:userID", async (req, res) => {
     const userID = req.params.userID;
 
     try {
-        const categories = await database.getTransactionCategoriesByUserID(userID);
+        const categories = await database.getTransactionCategoriesByUserID(
+            userID
+        );
         res.json({ categories: categories });
     } catch (error) {
         console.error(`Error getting transaction categories: ${error}`);
@@ -189,16 +203,24 @@ app.get("/api/get/transactions/categories/:userID", async (req, res) => {
     }
 });
 
-app.get("/api/get/transactions/moneySpentOnEachCategory/:userID", async (req, res) => {
-    const userID = req.params.userID;
+app.get(
+    "/api/get/transactions/moneySpentOnEachCategory/:userID",
+    async (req, res) => {
+        const userID = req.params.userID;
 
-    try {
-        const moneySpentOnEachCategory = await database.getMoneySpentOnEachCategory(userID);
-        res.json({ data: moneySpentOnEachCategory });
-    } catch (error) {
-        console.error(`Error getting money spent on each category: ${error}`);
-        res.status(500);
+        try {
+            const moneySpentOnEachCategory =
+                await database.getMoneySpentOnEachCategory(userID);
+            res.json({ data: moneySpentOnEachCategory });
+        } catch (error) {
+            console.error(
+                `Error getting money spent on each category: ${error}`
+            );
+            res.status(500);
+        }
     }
-});
+);
 
-app.listen(PORT, () => { console.log(`Server starts on port ${PORT}...`) });
+app.listen(PORT, () => {
+    console.log(`Server starts on port ${PORT}...`);
+});
