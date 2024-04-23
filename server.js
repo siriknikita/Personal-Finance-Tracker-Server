@@ -7,10 +7,12 @@ const app = express();
 
 app.use(bodyParser.json());
 
-app.use(cors());
 app.use(
     cors({
-        origin: "http://localhost:3000",
+        origin: [
+            "http://localhost:3000",
+            "https://personal-finance-tracker-server.azurewebsites.net/",
+        ],
         methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
         credentials: true,
     })
@@ -19,18 +21,23 @@ app.use(
 const PORT = process.env.PORT || 8080;
 
 app.get("/", (req, res) => {
-    res.send("Hello World from server!");
+    try {
+        res.send("Hello World from server!");
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            error: "Internal Server Error",
+            message: error.message,
+        });
+    }
 });
 
 app.get("/api/signup/:username/:email/:passwordHash", async (req, res) => {
     const username = req.params.username;
     const email = req.params.email;
-    const password = req.params.passwordHash;
+    const passwordHash = req.params.passwordHash;
 
     try {
-        const salt = await bcrypt.genSalt(10);
-        const passwordHash = await bcrypt.hash(password, salt);
-
         const user = await database.createUser(username, email, passwordHash);
         res.json({ user: user });
     } catch (error) {
@@ -41,18 +48,17 @@ app.get("/api/signup/:username/:email/:passwordHash", async (req, res) => {
 
 app.get("/api/login/:email/:password", async (req, res) => {
     const email = req.params.email;
-    const password = req.params.passwordHash;
+    const password = req.params.password;
 
     try {
-        const user = await database.getUserByEmail(email);
+        const user = await database.getUser(email);
         if (!user) {
             return res
                 .status(404)
                 .json({ user: {}, message: "User not found" });
         }
 
-        const passwordMatch = await bcrypt.compare(password, user.passwordHash);
-        if (passwordMatch) {
+        if (password === user.password) {
             return res.json({ user: user });
         } else {
             return res.status(401).json({ message: "Incorrect password" });
