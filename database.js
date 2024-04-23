@@ -15,11 +15,10 @@ const config = {
     },
 };
 
-const pool = sql.connect(config);
-
 // User section
 async function getUser(email) {
     try {
+        const pool = await sql.connect(config);
         let user = await pool
             .request()
             .input("email", sql.VarChar, email)
@@ -36,6 +35,7 @@ async function getUser(email) {
 
 async function createUser(username, email, passwordHash) {
     try {
+        const pool = await sql.connect(config);
         let datetime = moment().format("YYYY-MM-DD HH:mm:ss.zzz") + "000";
         const user = await getUser(email);
         if (user) {
@@ -65,6 +65,7 @@ async function loginUser(email, password) {
     const user = await getUser(email);
     if (user.passwordHash === password) {
         try {
+            const pool = await sql.connect(config);
             await pool.request().query(
                 `UPDATE Users
                     SET isAuthorized = 1
@@ -82,6 +83,7 @@ async function loginUser(email, password) {
 // Transactions section
 async function getTransactionCategoriesIDByUserID(userID) {
     try {
+        const pool = await sql.connect(config);
         let categories = await pool
             .request()
             .input("userID", sql.Int, userID)
@@ -104,6 +106,7 @@ async function getTransactionCategoriesIDByUserID(userID) {
 
 async function getCategoryNameByID(categoryID) {
     try {
+        const pool = await sql.connect(config);
         let categoryName = await pool
             .request()
             .input("categoryID", sql.Int, categoryID)
@@ -137,6 +140,7 @@ async function getUniqueCategoriesList(userID) {
 
 async function getTransactionMoneyByUserID(userID) {
     try {
+        const pool = await sql.connect(config);
         let moneySpent = await pool
             .request()
             .input("userID", sql.Int, userID)
@@ -171,6 +175,7 @@ async function getMoneySpentOnEachCategory(userID) {
 
 async function addTransaction(userID, amount, categoryID) {
     try {
+        const pool = await sql.connect(config);
         let response = await pool
             .request()
             .input("userID", sql.Int, userID)
@@ -193,6 +198,7 @@ async function addTransaction(userID, amount, categoryID) {
 async function getTransactionsByID(userID) {
     console.log("[GET TRANSACTIONS BY ID] userID: " + userID);
     try {
+        const pool = await sql.connect(config);
         let transactions = await pool
             .request()
             .input("userID", sql.Int, userID)
@@ -209,6 +215,7 @@ async function getTransactionsByID(userID) {
 
 async function getTotalSpent(userID) {
     try {
+        const pool = await sql.connect(config);
         let totalSpent = await pool
             .request()
             .input("userID", sql.Int, userID)
@@ -228,6 +235,7 @@ async function updateTotalMoneySpentByUserID(userID, amount) {
         let totalSpent = await getTotalSpent(userID);
         let updateAmount = parseFloat(amount);
         let updatedTotalSpent = totalSpent + updateAmount;
+        const pool = await sql.connect(config);
         let response = await pool
             .request()
             .input("updatedTotalSpent", sql.Decimal, updatedTotalSpent)
@@ -246,6 +254,7 @@ async function updateTotalMoneySpentByUserID(userID, amount) {
 // Update control section
 async function updateEmail(currentEmail, newEmail) {
     try {
+        const pool = await sql.connect(config);
         let response = await pool
             .request()
             .input("newEmail", sql.VarChar, newEmail)
@@ -263,6 +272,7 @@ async function updateEmail(currentEmail, newEmail) {
 
 async function updatePassword(email, newPassword) {
     try {
+        const pool = await sql.connect(config);
         let response = await pool
             .request()
             .input("newPassword", sql.VarChar, newPassword)
@@ -280,6 +290,7 @@ async function updatePassword(email, newPassword) {
 
 async function updateUsername(email, currentUsername, newUsername) {
     try {
+        const pool = await sql.connect(config);
         let user = await getUser(email);
         if (user.username === currentUsername) {
             let response = await pool
@@ -303,6 +314,7 @@ async function updateUsername(email, currentUsername, newUsername) {
 // Goals section
 async function addGoal(userID, description, deadline) {
     try {
+        const pool = await sql.connect(config);
         let response = await pool
             .request()
             .input("userID", sql.Int, userID)
@@ -320,6 +332,7 @@ async function addGoal(userID, description, deadline) {
 
 async function getGoals(userID) {
     try {
+        const pool = await sql.connect(config);
         let goals = await pool
             .request()
             .input("userID", sql.Int, userID)
