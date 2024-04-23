@@ -1,16 +1,17 @@
 const express = require("express");
 const database = require("./database");
 const bodyParser = require("body-parser");
-const bcrypt = require("bcrypt");
 const cors = require("cors");
 const app = express();
 
 app.use(bodyParser.json());
 
+app.use(cors());
 app.use(
     cors({
         origin: [
             "http://localhost:3000",
+            "https://personal-finance-tracker-pft-client.azurewebsites.net",
             "https://personal-finance-tracker-server.azurewebsites.net/",
         ],
         methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
@@ -58,7 +59,7 @@ app.get("/api/login/:email/:password", async (req, res) => {
                 .json({ user: {}, message: "User not found" });
         }
 
-        if (password === user.password) {
+        if (password === user.passwordHash) {
             return res.json({ user: user });
         } else {
             return res.status(401).json({ message: "Incorrect password" });
