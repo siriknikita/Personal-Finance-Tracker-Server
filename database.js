@@ -318,11 +318,11 @@ async function addGoal(userID, description, deadline) {
         let response = await pool
             .request()
             .input("userID", sql.Int, userID)
-            .input("description", sql.VarChar, description)
+            .input("description", sql.NVarChar, description)
             .input("deadline", sql.Date, deadline)
             .query(
-                `INSERT INTO Goals (userID, N'description', deadline)
-                VALUES (@userID, N'@description', @deadline)`
+                `INSERT INTO Goals (userID, description, deadline)
+                VALUES (@userID, @description, @deadline)`
             );
         return response.rowsAffected[0] === 1;
     } catch (error) {
