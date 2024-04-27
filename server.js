@@ -33,13 +33,13 @@ app.get("/", (req, res) => {
     }
 });
 
-app.get("/api/signup/:username/:email/:passwordHash", async (req, res) => {
+app.get("/api/signup/:username/:email/:passwordHash/", async (req, res) => {
     const username = req.params.username;
     const email = req.params.email;
     const passwordHash = req.params.passwordHash;
 
     try {
-        const user = await database.createUser(username, email, passwordHash);
+        let user = await database.createUser(username, email, passwordHash);
         res.json({ user: user });
     } catch (error) {
         console.error(`[SIGNUP] Error creating a user: ${error}`);
@@ -47,9 +47,10 @@ app.get("/api/signup/:username/:email/:passwordHash", async (req, res) => {
     }
 });
 
-app.get("/api/login/:email/:password", async (req, res) => {
+app.get("/api/login/:email/:password/:isGoogle", async (req, res) => {
     const email = req.params.email;
     const password = req.params.password;
+    const isGoogle = req.params.isGoogle;
 
     try {
         const user = await database.getUser(email);
@@ -58,7 +59,10 @@ app.get("/api/login/:email/:password", async (req, res) => {
                 .status(404)
                 .json({ user: {}, message: "User not found" });
         }
-        if (user.passwordHash === password && user.email === email) {
+        if (
+            (isGoogle === "true" && user.email === email) ||
+            user.passwordHash === password
+        ) {
             return res.json({ user: user });
         } else {
             return res.status(401).json({ message: "Incorrect password" });
