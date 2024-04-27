@@ -321,8 +321,8 @@ async function addGoal(userID, description, deadline) {
             .input("description", sql.VarChar, description)
             .input("deadline", sql.Date, deadline)
             .query(
-                `INSERT INTO Goals (userID, description, deadline)
-                VALUES (@userID, @description, @deadline)`
+                `INSERT INTO Goals (userID, N'description', deadline)
+                VALUES (@userID, N'@description', @deadline)`
             );
         return response.rowsAffected[0] === 1;
     } catch (error) {
