@@ -42,7 +42,7 @@ app.get("/api/signup/:username/:email/:passwordHash", async (req, res) => {
         const user = await database.createUser(username, email, passwordHash);
         res.json({ user: user });
     } catch (error) {
-        console.error(`Error creating a user: ${error}`);
+        console.error(`[SIGNUP] Error creating a user: ${error}`);
         res.status(500);
     }
 });
@@ -58,8 +58,7 @@ app.get("/api/login/:email/:password", async (req, res) => {
                 .status(404)
                 .json({ user: {}, message: "User not found" });
         }
-
-        if (password === user.passwordHash) {
+        if (user.passwordHash === password && user.email === email) {
             return res.json({ user: user });
         } else {
             return res.status(401).json({ message: "Incorrect password" });
