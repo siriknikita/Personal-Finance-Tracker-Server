@@ -39,8 +39,13 @@ app.get("/api/signup/:username/:email/:passwordHash/", async (req, res) => {
     const passwordHash = req.params.passwordHash;
 
     try {
-        let user = await database.createUser(username, email, passwordHash);
-        res.json({ user: user });
+        const emailRegex = /^[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ error: "Invalid email format" });
+        } else {
+            let user = await database.createUser(username, email, passwordHash);
+            res.status(200).json({ user: user });
+        }
     } catch (error) {
         console.error(`[SIGNUP] Error creating a user: ${error}`);
         res.status(500);
