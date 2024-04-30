@@ -391,6 +391,24 @@ async function getUsersSpending() {
   }
 }
 
+async function getTotalUsersSpending() {
+  try {
+    let totalUsersSpending = {};
+    const categories = await getCategoriesList();
+    for (let i = 0; i < categories.length; i++) {
+      const moneySpent = await getMoneySpentByCategoryID(categories[i].id);
+      let totalSpent = 0;
+      for (let j = 0; j < moneySpent.length; j++) {
+        totalSpent += moneySpent[j];
+      }
+      totalUsersSpending[categories[i].name] = totalSpent;
+    }
+    return totalUsersSpending;
+  } catch (error) {
+    console.log("[GET TOTAL USERS SPENDING] Error: " + error);
+  }
+}
+
 module.exports = {
   getUser,
   createUser,
@@ -409,5 +427,5 @@ module.exports = {
   updateUsername,
   addGoal,
   getGoals,
-  getUsersSpending,
+  getTotalUsersSpending,
 };

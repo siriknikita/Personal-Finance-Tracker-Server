@@ -233,7 +233,7 @@ app.get(
 
 app.get("/api/admin/get/usersSpending", async (req, res) => {
   try {
-    const usersSpending = await database.getUsersSpending();
+    const usersSpending = await database.getTotalUsersSpending();
     res.json({ usersSpending: usersSpending });
   } catch (error) {
     console.error(`Error getting users spending: ${error}`);
