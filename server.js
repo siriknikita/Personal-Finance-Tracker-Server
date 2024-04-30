@@ -231,6 +231,16 @@ app.get(
   }
 );
 
+app.get("/api/admin/get/usersSpending", async (req, res) => {
+  try {
+    const usersSpending = await database.getUsersSpending();
+    res.json({ usersSpending: usersSpending });
+  } catch (error) {
+    console.error(`Error getting users spending: ${error}`);
+    res.status(500);
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server starts on port ${PORT}...`);
 });
