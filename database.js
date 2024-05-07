@@ -33,6 +33,16 @@ async function getUser(email) {
   }
 }
 
+async function getUsers() {
+  try {
+    const pool = await sql.connect(config);
+    let users = await pool.request().query("SELECT * FROM Users");
+    return users.recordset;
+  } catch (error) {
+    console.log("[GET USERS] Error: " + error);
+  }
+}
+
 async function createUser(username, email, passwordHash) {
   try {
     const pool = await sql.connect(config);
@@ -411,6 +421,7 @@ async function getTotalUsersSpending() {
 
 module.exports = {
   getUser,
+  getUsers,
   createUser,
   loginUser,
   getCategoryNameByID,

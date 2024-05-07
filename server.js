@@ -85,6 +85,16 @@ app.get("/api/get/user/:email", async (req, res) => {
   }
 });
 
+app.get("/api/get/users", async (req, res) => {
+  try {
+    const users = await database.getUsers();
+    res.json({ users: users });
+  } catch (error) {
+    console.error(`Error getting users: ${error}`);
+    res.status(500);
+  }
+});
+
 app.post("/api/update/email", async (req, res) => {
   const email = req.body.email;
   const newEmail = req.body.newEmail;
