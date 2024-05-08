@@ -279,7 +279,7 @@ async function updateEmail(currentEmail, newEmail) {
       .input("currentEmail", sql.VarChar, currentEmail)
       .query(
         `UPDATE Users
-                SET email = @newEmail
+        SET email = @newEmail
                 WHERE email = @currentEmail`
       );
     return response.rowsAffected[0] === 1;
@@ -317,8 +317,8 @@ async function updateUsername(email, currentUsername, newUsername) {
         .input("email", sql.VarChar, email)
         .query(
           `UPDATE Users
-                    SET username = @newUsername
-                    WHERE email = @email`
+          SET username = @newUsername
+          WHERE email = @email`
         );
       return response.rowsAffected[0] === 1;
     } else {
@@ -356,7 +356,7 @@ async function getGoals(userID) {
       .input("userID", sql.Int, userID)
       .query(
         `SELECT *
-                FROM Goals
+        FROM Goals
                 WHERE userID = @userID`
       );
     return goals.recordset;
@@ -383,6 +383,49 @@ async function getMoneySpentByCategoryID(categoryID) {
     return moneySpentList;
   } catch (error) {
     console.log("[GET MONEY SPENT BY CATEGORY ID] Error: " + error);
+  }
+}
+
+async function getTop5FrequentCategories() {
+  try {
+    const pool = await sql.connect(config);
+    let categories = await pool.request().query(
+      `SELECT TOP 5 categoryID, COUNT(categoryID) as count
+                FROM Transactions
+                GROUP BY categoryID
+                ORDER BY count DESC`
+    );
+    return categories.recordset;
+  } catch (error) {
+    console.log("[GET TOP 5 FREQUENT SPENDINGS CATEGORIES] Error: " + error);
+  }
+}
+
+async function getTop5CategoriesFrequencies() {
+  try {
+    let categories = await getTop5FrequentCategories();
+    let top5CategoriesFrequencies = {};
+    for (let i = 0; i < categories.length; i++) {
+      const categoryName = await getCategoryNameByID(categories[i].categoryID);
+      top5CategoriesFrequencies[categoryName] = categories[i].count;
+    }
+    return top5CategoriesFrequencies;
+  } catch (error) {
+    console.log("[GET TOP 5 CATEGORIES FREQUENCIES] Error: " + error);
+  }
+}
+
+async function getTop5CategoriesNames() {
+  try {
+    let categories = await getTop5FrequentCategories();
+    let top5CategoriesNames = [];
+    for (let i = 0; i < categories.length; i++) {
+      const categoryName = await getCategoryNameByID(categories[i].categoryID);
+      top5CategoriesNames.push(categoryName);
+    }
+    return top5CategoriesNames;
+  } catch (error) {
+    console.log("[GET TOP 5 CATEGORIES NAMES] Error: " + error);
   }
 }
 
@@ -432,6 +475,9 @@ module.exports = {
   getTransactionsByID,
   getTotalSpent,
   getUniqueCategoriesList,
+  getTop5FrequentCategories,
+  getTop5CategoriesNames,
+  getTop5CategoriesFrequencies,
   updateTotalMoneySpentByUserID,
   updateEmail,
   updatePassword,

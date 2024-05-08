@@ -241,6 +241,18 @@ app.get(
   }
 );
 
+app.get("/api/get/transactions/spendings/top5", async (req, res) => {
+  try {
+    const top5SpendingsFreq = await database.getTop5CategoriesFrequencies();
+    res.json({
+      top5Spendings: top5SpendingsFreq,
+    });
+  } catch (error) {
+    console.error(`Error getting top 5 spendings: ${error}`);
+    res.status(500);
+  }
+});
+
 app.get("/api/admin/get/usersSpending", async (req, res) => {
   try {
     const usersSpending = await database.getTotalUsersSpending();
