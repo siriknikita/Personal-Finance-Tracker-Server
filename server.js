@@ -1,10 +1,6 @@
 const express = require("express");
-const database = require("./database");
-const bodyParser = require("body-parser");
 const cors = require("cors");
 const app = express();
-
-app.use(bodyParser.json());
 
 app.use(cors());
 app.use(
@@ -19,8 +15,6 @@ app.use(
   })
 );
 
-const PORT = process.env.PORT || 8080;
-
 app.get("/", (req, res) => {
   try {
     res.send("Hello World from server!");
@@ -33,235 +27,19 @@ app.get("/", (req, res) => {
   }
 });
 
-app.get("/api/signup/:username/:email/:passwordHash/", async (req, res) => {
-  const username = req.params.username;
-  const email = req.params.email;
-  const passwordHash = req.params.passwordHash;
+const authRoutes = require("./routes/auth");
+const goalsRoutes = require("./routes/goals");
+const userRoutes = require("./routes/user");
+const transactionsRoutes = require("./routes/transactions");
+const adminRoutes = require("./routes/admin");
 
-  try {
-    let user = await database.createUser(username, email, passwordHash);
-    res.status(200).json({ user: user });
-  } catch (error) {
-    console.error(`[SIGNUP] Error creating a user: ${error}`);
-    res.status(500);
-  }
-});
+app.use("/api/auth", authRoutes);
+app.use("/api/goals", goalsRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/transactions", transactionsRoutes);
+app.use("/api/admin", adminRoutes);
 
-app.get("/api/login/:email/:password/:isGoogle/:isAdmin", async (req, res) => {
-  const email = req.params.email;
-  const password = req.params.password;
-  const isGoogle = req.params.isGoogle;
-  const isAdmin = req.params.isAdmin;
-
-  try {
-    const user = await database.getUser(email);
-    if (!user) {
-      return res.status(404).json({ user: {}, message: "User not found" });
-    }
-    if (
-      (isGoogle === "true" && user.email === email) ||
-      user.passwordHash === password
-    ) {
-      const newUser = { ...user, isAdmin: isAdmin };
-      return res.json({ user: newUser });
-    } else {
-      return res.status(401).json({ message: "Incorrect password" });
-    }
-  } catch (error) {
-    console.error(`Error logging in: ${error}`);
-    return res.status(500).json({ message: `Error logging in: ${error}` });
-  }
-});
-
-app.get("/api/get/user/:email", async (req, res) => {
-  const email = req.params.email;
-
-  try {
-    const user = await database.getUser(email);
-    res.json({ user: user });
-  } catch (error) {
-    console.error(`Error getting a user: ${error}`);
-    res.status(500);
-  }
-});
-
-app.get("/api/get/users", async (req, res) => {
-  try {
-    const users = await database.getUsers();
-    res.json({ users: users });
-  } catch (error) {
-    console.error(`Error getting users: ${error}`);
-    res.status(500);
-  }
-});
-
-app.post("/api/update/email", async (req, res) => {
-  const email = req.body.email;
-  const newEmail = req.body.newEmail;
-
-  try {
-    const response = await database.updateEmail(email, newEmail);
-    if (response) {
-      res.json({ message: "Email updated successfully" });
-    }
-  } catch (error) {
-    console.error(`Error updating email: ${error}`);
-    res.status(500);
-  }
-});
-
-app.post("/api/update/password", async (req, res) => {
-  const email = req.body.email;
-  const newPasswordHash = req.body.newPasswordHash;
-
-  try {
-    const response = await database.updatePassword(email, newPasswordHash);
-    if (response) {
-      res.json({ message: "Password updated successfully" });
-    }
-  } catch (error) {
-    console.error(`Error updating password: ${error}`);
-    res.status(500);
-  }
-});
-
-app.post("/api/update/username", async (req, res) => {
-  const email = req.body.email;
-  const currentUsername = req.body.currentUsername;
-  const newUsername = req.body.newUsername;
-
-  try {
-    const response = await database.updateUsername(
-      email,
-      currentUsername,
-      newUsername
-    );
-    if (response) {
-      res.json({ message: "Username updated successfully" });
-    }
-  } catch (error) {
-    console.error(`Error updating username: ${error}`);
-    res.status(500);
-  }
-});
-
-app.post("/api/set/goal", async (req, res) => {
-  const userID = req.body.userID;
-  const goalDescription = req.body.goal;
-  const goalDate = req.body.deadline;
-
-  try {
-    const response = await database.addGoal(userID, goalDescription, goalDate);
-    if (response) {
-      res.json({ message: "Goal set successfully" });
-    }
-  } catch (error) {
-    console.error(`Error setting goal: ${error}`);
-    res.status(500);
-  }
-});
-
-app.get("/api/get/goals/:userID", async (req, res) => {
-  const userID = req.params.userID;
-
-  try {
-    const goals = await database.getGoals(userID);
-    res.json({ goals: goals });
-  } catch (error) {
-    console.error(`Error getting goals: ${error}`);
-    res.status(500);
-  }
-});
-
-app.post("/api/add/transaction", async (req, res) => {
-  const userID = req.body.userID;
-  const amount = req.body.amount;
-  const categoryID = req.body.categoryID;
-
-  try {
-    const response = await database.addTransaction(userID, amount, categoryID);
-    if (response) {
-      res.json({ message: "Transaction added successfully" });
-    }
-  } catch (error) {
-    console.error(`Error adding transaction: ${error}`);
-    res.status(500);
-  }
-});
-
-app.get("/api/get/transactions/:userID", async (req, res) => {
-  const userID = req.params.userID;
-
-  try {
-    const transactions = await database.getTransactionsByID(userID);
-    res.json({ transactions: transactions });
-  } catch (error) {
-    console.error(`Error getting transactions: ${error}`);
-    res.status(500);
-  }
-});
-
-app.get("/api/get/transactions/moneySpent/:userID", async (req, res) => {
-  const userID = req.params.userID;
-
-  try {
-    const moneySpent = await database.getTransactionMoneyByUserID(userID);
-    res.json({ moneySpent: moneySpent });
-  } catch (error) {
-    console.error(`Error getting total spent: ${error}`);
-    res.status(500);
-  }
-});
-
-app.get("/api/get/transactions/categories/:userID", async (req, res) => {
-  const userID = req.params.userID;
-
-  try {
-    const categories = await database.getTransactionCategoriesByUserID(userID);
-    res.json({ categories: categories });
-  } catch (error) {
-    console.error(`Error getting transaction categories: ${error}`);
-    res.status(500);
-  }
-});
-
-app.get(
-  "/api/get/transactions/moneySpentOnEachCategory/:userID",
-  async (req, res) => {
-    const userID = req.params.userID;
-
-    try {
-      const moneySpentOnEachCategory =
-        await database.getMoneySpentOnEachCategory(userID);
-      res.json({ data: moneySpentOnEachCategory });
-    } catch (error) {
-      console.error(`Error getting money spent on each category: ${error}`);
-      res.status(500);
-    }
-  }
-);
-
-app.get("/api/get/transactions/spendings/top5", async (req, res) => {
-  try {
-    const top5SpendingsFreq = await database.getTop5CategoriesFrequencies();
-    res.json({
-      top5Spendings: top5SpendingsFreq,
-    });
-  } catch (error) {
-    console.error(`Error getting top 5 spendings: ${error}`);
-    res.status(500);
-  }
-});
-
-app.get("/api/admin/get/usersSpending", async (req, res) => {
-  try {
-    const usersSpending = await database.getTotalUsersSpending();
-    res.json({ usersSpending: usersSpending });
-  } catch (error) {
-    console.error(`Error getting users spending: ${error}`);
-    res.status(500);
-  }
-});
+const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, () => {
   console.log(`Server starts on port ${PORT}...`);
