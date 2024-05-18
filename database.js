@@ -4,6 +4,8 @@ require('dotenv').config();
 
 // TODO: Split functions into different files based on functionality block
 
+// You need to use ORM not to use sql requests, because I can drop your database in 2 seconds
+
 const config = {
     user: 'finance-tracker-admin',
     password: 'Database-PFT-password',

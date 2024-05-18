@@ -6,13 +6,13 @@ const database = require('../database');
 router.use(bodyParser.json());
 router.use(express.json());
 
-router.get('/signup/:username/:email/:passwordHash/', async (req, res) => {
-    try {
-        // TODO: Use object destructuring instead
-        const username = req.params.username;
-        const email = req.params.email;
-        const passwordHash = req.params.passwordHash;
-
+// Use POST methods instead of GET to send data in body
+// TODO: Use object destructuring instead
+router.get("/signup/:username/:email/:passwordHash/", async (req, res) => {
+  try {
+    const username = req.params.username;
+    const email = req.params.email;
+    const passwordHash = req.params.passwordHash;
         const user = await database.createUser(username, email, passwordHash);
         res.status(200).json({ user: user });
     } catch (error) {
