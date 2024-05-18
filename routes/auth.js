@@ -6,6 +6,8 @@ const database = require("../database");
 router.use(bodyParser.json());
 router.use(express.json());
 
+// Use POST methods instead of GET to send data in body
+
 router.get("/signup/:username/:email/:passwordHash/", async (req, res) => {
   try {
     const username = req.params.username;

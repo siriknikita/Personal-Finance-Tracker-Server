@@ -2,6 +2,8 @@ const sql = require("mssql");
 const moment = require("moment");
 require("dotenv").config();
 
+// You need to use ORM not to use sql requests, because I can drop your database in 2 seconds
+
 const config = {
   user: "finance-tracker-admin",
   password: "Database-PFT-password",
