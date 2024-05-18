@@ -32,12 +32,14 @@ const goalsRoutes = require("./routes/goals");
 const userRoutes = require("./routes/user");
 const transactionsRoutes = require("./routes/transactions");
 const adminRoutes = require("./routes/admin");
+const blobRoutes = require("./routes/blobStorage");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/goals", goalsRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/transactions", transactionsRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/blob", blobRoutes);
 
 const PORT = process.env.PORT || 8080;
 
