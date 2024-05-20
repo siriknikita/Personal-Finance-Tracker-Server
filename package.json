@@ -2,7 +2,7 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
     "start": "node server",
     "dev": "nodemon server"
@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@azure/storage-blob": "^12.18.0",
+    "applicationinsights": "^3.1.0",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
