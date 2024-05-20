@@ -55,7 +55,7 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'itfin-back'
+          app-name: 'personal-finance-tracker-server'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_ED30A67B7E6B47ED9FDB8EF4A81588AC }}
           package: release.zip
