@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy Node.js app to Azure Web App - personal-finance-tracker-server
+name: Build and deploy Node.js app to Azure Web App - itfin-back
 
 on:
   push:
@@ -11,13 +11,13 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v2
 
       - name: Set up Node.js version
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v1
         with:
           node-version: '18.x'
 
@@ -25,18 +25,18 @@ jobs:
         run: |
           npm install
           npm run build --if-present
-          npm run test --if-present
-      
-      - name: Zip build artifacts
-        run: |
-          New-Item -ItemType Directory -Force -Path build-artifacts
-          Compress-Archive -Path * -CompressionLevel Optimal -DestinationPath build-artifacts/node-app.zip
+
+      - name: Zip Release
+        uses: TheDoctor0/zip-release@0.6.1
+        with:
+          filename: release.zip
+          path: ./*
       
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: node-app
-          path: build-artifacts/node-app.zip
+          path: release.zip
 
   deploy:
     runs-on: ubuntu-latest
@@ -44,23 +44,18 @@ jobs:
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    
+
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v2
         with:
           name: node-app
-          path: build-artifacts/node-app.zip
-      
-      - name: Unzip artifact
-        run: |
-          unzip build-artifacts/node-app.zip -d app
 
       - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v2
         id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
         with:
-          app-name: 'personal-finance-tracker-server'
+          app-name: 'itfin-back'
           slot-name: 'Production'
-          package: ./app
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_ED30A67B7E6B47ED9FDB8EF4A81588AC }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_82F201F3A7154F098B63D749842619D3 }}
+          package: release.zip
