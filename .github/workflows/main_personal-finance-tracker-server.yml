@@ -27,11 +27,16 @@ jobs:
           npm run build --if-present
           npm run test --if-present
       
+      - name: Zip build artifacts
+        run: |
+          mkdir -p build-artifacts
+          zip -r build-artifacts/node-app.zip .
+      
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
           name: node-app
-          path: .
+          path: build-artifacts/node-app.zip
 
   deploy:
     runs-on: ubuntu-latest
@@ -45,12 +50,17 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: node-app
+          path: build-artifacts/node-app.zip
       
+      - name: Unzip artifact
+        run: |
+          unzip build-artifacts/node-app.zip -d app
+
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v2
         id: deploy-to-webapp
         with:
           app-name: 'personal-finance-tracker-server'
           slot-name: 'Production'
-          package: .
+          package: ./app
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_ED30A67B7E6B47ED9FDB8EF4A81588AC }}
