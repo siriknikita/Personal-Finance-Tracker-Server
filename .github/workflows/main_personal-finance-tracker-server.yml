@@ -57,5 +57,5 @@ jobs:
         with:
           app-name: 'itfin-back'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_82F201F3A7154F098B63D749842619D3 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_ED30A67B7E6B47ED9FDB8EF4A81588AC }}
           package: release.zip
