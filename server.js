@@ -31,7 +31,7 @@ app.use(
 
 app.get("/", (req, res) => {
   try {
-    res.send("Hello World from server!");
+    res.send("Test Hello World from server!");
   } catch (error) {
     console.error(error);
     res.status(500).json({
