@@ -29,8 +29,8 @@ jobs:
       
       - name: Zip build artifacts
         run: |
-          mkdir -p build-artifacts
-          zip -r build-artifacts/node-app.zip .
+          New-Item -ItemType Directory -Force -Path build-artifacts
+          Compress-Archive -Path * -CompressionLevel Optimal -DestinationPath build-artifacts/node-app.zip
       
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
