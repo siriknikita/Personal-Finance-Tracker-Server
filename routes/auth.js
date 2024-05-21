@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
-const { getUser, createUser, loginUser } = require("../services/userService");
+const { createUser, loginUser } = require("../services/userService");
 const { User } = require("../models");
 
 router.use(bodyParser.json());
@@ -36,9 +36,10 @@ router.post("/login", async (req, res) => {
     }
 
     const isMatch = password === user.passwordHash;
-    if (!isMatch) {
+    if (!isMatch && !isGoogle) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
+    console.log("The passwords did match");
 
     const token = jwt.sign(
       { id: user.userID, email: user.email },

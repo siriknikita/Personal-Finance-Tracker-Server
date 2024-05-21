@@ -48,12 +48,14 @@ async function getUniqueCategoriesList(userID) {
 
 async function getTransactionMoneyByUserID(userID) {
   try {
+    console.log("User ID:", userID);
     const transactions = await Transaction.findAll({
-      where: { userID },
+      where: { userID: userID },
       attributes: ["amount"],
     });
+    console.log("Transactions: ", transactions);
 
-    return transactions.map((transaction) => transaction.amount);
+    return transactions.map((transaction) => transaction.dataValues.amount);
   } catch (error) {
     console.error("[GET TRANSACTION MONEY BY USER ID] Error: " + error);
   }
