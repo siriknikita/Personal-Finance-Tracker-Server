@@ -44,16 +44,14 @@ async function createUser(username, email, passwordHash) {
 async function loginUser(email, password, isGoogle=false) {
   try {
     const userData = await getUser(email);
-    const user = userData.dataValues;
-    if (user && isGoogle && user.passwordHash === password) {
-      user.isAuthorized = true;
-      await user.save();
-      console.log("User updated:", user);
-      return user;
-    } else if (user && user.passwordHash === password) {
-      user.isAuthorized = true;
-      await user.save();
-      return user;
+    if (userData && isGoogle) {
+      userData.isAuthorized = true;
+      await userData.save()
+      return userData.dataValues;
+    } else if (userData && !isGoogle && userData.passwordHash === password) {
+      userData.isAuthorized = true;
+      await userData.save()
+      return userData.dataValues;
     } else {
       return null;
     }

@@ -62,11 +62,12 @@ async function getTransactionMoneyByUserID(userID) {
 async function getMoneySpentOnEachCategory(userID) {
   const categories = await getTransactionCategoriesByUserID(userID);
   const moneySpent = await getTransactionMoneyByUserID(userID);
-
-  return categories.reduce((acc, category, index) => {
+  const data = categories.reduce((acc, category, index) => {
     acc[category] = (acc[category] || 0) + moneySpent[index];
     return acc;
   }, {});
+
+  return data;
 }
 
 async function addTransaction(userID, amount, categoryID) {
