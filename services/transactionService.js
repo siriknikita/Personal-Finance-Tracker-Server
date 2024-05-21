@@ -9,7 +9,7 @@ async function getTransactionCategoriesIDByUserID(userID) {
 
     return transactions.map((transaction) => transaction.categoryID);
   } catch (error) {
-    console.log("[GET TRANSACTION CATEGORIES ID BY USER ID] Error: " + error);
+    console.error("[GET TRANSACTION CATEGORIES ID BY USER ID] Error: " + error);
   }
 }
 
@@ -21,7 +21,7 @@ async function getCategoryNameByID(categoryID) {
 
     return category ? category.name : null;
   } catch (error) {
-    console.log("[GET CATEGORY NAME BY ID] Error: " + error);
+    console.error("[GET CATEGORY NAME BY ID] Error: " + error);
   }
 }
 
@@ -37,7 +37,7 @@ async function getCategoriesList() {
   try {
     return await Category.findAll();
   } catch (error) {
-    console.log("[GET CATEGORIES LIST] Error: " + error);
+    console.error("[GET CATEGORIES LIST] Error: " + error);
   }
 }
 
@@ -55,7 +55,7 @@ async function getTransactionMoneyByUserID(userID) {
 
     return transactions.map((transaction) => transaction.amount);
   } catch (error) {
-    console.log("[GET TRANSACTION MONEY BY USER ID] Error: " + error);
+    console.error("[GET TRANSACTION MONEY BY USER ID] Error: " + error);
   }
 }
 
@@ -78,16 +78,16 @@ async function addTransaction(userID, amount, categoryID) {
     });
     return transaction ? true : false;
   } catch (error) {
-    console.log("[ADD TRANSACTION] Error: " + error);
+    console.error("[ADD TRANSACTION] Error: " + error);
   }
 }
 
 async function getTransactionsByID(userID) {
-  console.log("[GET TRANSACTIONS BY ID] userID: " + userID);
+  console.error("[GET TRANSACTIONS BY ID] userID: " + userID);
   try {
     return await Transaction.findAll({ where: { userID } });
   } catch (error) {
-    console.log("[GET TRANSACTIONS BY ID] Error: " + error);
+    console.error("[GET TRANSACTIONS BY ID] Error: " + error);
   }
 }
 
@@ -99,7 +99,7 @@ async function getTotalSpent(userID) {
 
     return user ? user.totalSpent : 0;
   } catch (error) {
-    console.log("[GET TOTAL SPENT] Error: " + error);
+    console.error("[GET TOTAL SPENT] Error: " + error);
   }
 }
 
@@ -115,7 +115,7 @@ async function updateTotalMoneySpentByUserID(userID, amount) {
 
     return true;
   } catch (error) {
-    console.log("[UPDATE TOTAL SPENT BY USER ID] Error: " + error);
+    console.error("[UPDATE TOTAL SPENT BY USER ID] Error: " + error);
   }
 }
 
@@ -125,11 +125,10 @@ async function getMoneySpentByCategoryID(categoryID) {
       where: { categoryID: categoryID },
       attributes: ["amount"],
     });
-    console.log(transactions);
 
     return transactions.map((transaction) => transaction.dataValues.amount);
   } catch (error) {
-    console.log("[GET MONEY SPENT BY CATEGORY ID] Error: " + error);
+    console.error("[GET MONEY SPENT BY CATEGORY ID] Error: " + error);
   }
 }
 
@@ -150,7 +149,7 @@ async function getTop5FrequentCategories() {
       count: category.get("count"),
     }));
   } catch (error) {
-    console.log("[GET TOP 5 FREQUENT SPENDINGS CATEGORIES] Error: " + error);
+    console.error("[GET TOP 5 FREQUENT SPENDINGS CATEGORIES] Error: " + error);
   }
 }
 
@@ -166,7 +165,7 @@ async function getTop5CategoriesFrequencies() {
 
     return top5CategoriesFrequencies;
   } catch (error) {
-    console.log("[GET TOP 5 CATEGORIES FREQUENCIES] Error: " + error);
+    console.error("[GET TOP 5 CATEGORIES FREQUENCIES] Error: " + error);
   }
 }
 
@@ -182,7 +181,7 @@ async function getTop5CategoriesNames() {
 
     return top5CategoriesNames;
   } catch (error) {
-    console.log("[GET TOP 5 CATEGORIES NAMES] Error: " + error);
+    console.error("[GET TOP 5 CATEGORIES NAMES] Error: " + error);
   }
 }
 
@@ -190,7 +189,6 @@ async function getTotalUsersSpending() {
   try {
     const categoriesData = await getCategoriesList();
     const categories = categoriesData.map((category) => category.dataValues);
-    console.log(categories);
     const totalUsersSpending = {};
 
     for (const category of categories) {
@@ -203,7 +201,7 @@ async function getTotalUsersSpending() {
 
     return totalUsersSpending;
   } catch (error) {
-    console.log("[GET TOTAL USERS SPENDING] Error: " + error);
+    console.error("[GET TOTAL USERS SPENDING] Error: " + error);
   }
 }
 

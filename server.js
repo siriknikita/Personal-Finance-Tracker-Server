@@ -1,7 +1,8 @@
-require('dotenv').config();
+require("dotenv").config();
 
 const appInsights = require("applicationinsights");
-appInsights.setup(process.env.AZURE_APPLICATION_INSIGHTS_CONNECTION_STRING)
+appInsights
+  .setup(process.env.AZURE_APPLICATION_INSIGHTS_CONNECTION_STRING)
   .setAutoDependencyCorrelation(true)
   .setAutoCollectRequests(true)
   .setAutoCollectPerformance(true, true)
@@ -58,11 +59,14 @@ app.use("/api/blob", blobRoutes);
 
 const PORT = process.env.PORT || 8080;
 
-sequelize.sync().then(() => {
-  console.log('Database synchronized');
-  app.listen(PORT, () => {
+sequelize
+  .sync()
+  .then(() => {
+    console.log("Database synchronized");
+    app.listen(PORT, () => {
       console.log(`Server starts on port ${PORT}...`);
+    });
+  })
+  .catch((err) => {
+    console.error("Unable to connect to the database:", err);
   });
-}).catch(err => {
-  console.error('Unable to connect to the database:', err);
-});
