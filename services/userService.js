@@ -43,7 +43,8 @@ async function createUser(username, email, passwordHash) {
 
 async function loginUser(email, password) {
   try {
-    const user = await getUser(email);
+    const userData = await getUser(email);
+    const user = userData.dataValues;
     if (user && user.passwordHash === password) {
       user.isAuthorized = true;
       await user.save();
