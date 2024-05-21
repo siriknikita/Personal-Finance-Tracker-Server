@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const bodyParser = require("body-parser");
-const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { getUser, createUser, loginUser } = require("../services/userService");
 const { User } = require("../models");
@@ -36,7 +35,7 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.passwordHash);
+    const isMatch = password === user.passwordHash;
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
