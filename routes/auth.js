@@ -1,54 +1,74 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const bodyParser = require('body-parser');
-const database = require('../database');
+const bodyParser = require("body-parser");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { getUser, createUser, loginUser } = require("../services/userService");
+const { User } = require("../models");
 
 router.use(bodyParser.json());
 router.use(express.json());
 
-// Use POST methods instead of GET to send data in body
-// TODO: Use object destructuring instead
-router.get("/signup/:username/:email/:passwordHash/", async (req, res) => {
+router.post("/register", async (req, res) => {
   try {
-    const username = req.params.username;
-    const email = req.params.email;
-    const passwordHash = req.params.passwordHash;
-        const user = await database.createUser(username, email, passwordHash);
-        res.status(200).json({ user: user });
-    } catch (error) {
-        console.error(`[SIGNUP] Error creating a user: ${error}`);
-        res.status(500);
+    const { username, email, password } = req.body;
+
+    const newUser = await createUser(username, email, password);
+    if (newUser === "User already exists") {
+      return res.status(400).json({ message: "User already exists" });
     }
+
+    res
+      .status(201)
+      .json({ message: "User created successfully", user: newUser });
+  } catch (error) {
+    console.error(`Error registering user: ${error}`);
+    res.status(500).send("Error registering user");
+  }
 });
 
-router.get('/login/:email/:password/:isGoogle/:isAdmin', async (req, res) => {
-    try {
-        // TODO: Use object destructuring instead
-        const email = req.params.email;
-        const password = req.params.password;
-        const isGoogle = req.params.isGoogle;
-        const isAdmin = req.params.isAdmin;
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await loginUser(email);
 
-        const user = await database.getUser(email);
-
-        if (!user) {
-            return res
-                .status(404)
-                .json({ user: {}, message: 'User not found' });
-        }
-        if (
-            (isGoogle === 'true' && user.email === email) ||
-            user.passwordHash === password
-        ) {
-            const newUser = { ...user, isAdmin: isAdmin };
-            return res.json({ user: newUser });
-        } else {
-            return res.status(401).json({ message: 'Incorrect password' });
-        }
-    } catch (error) {
-        console.error(`Error logging in: ${error}`);
-        return res.status(500).json({ message: `Error logging in: ${error}` });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid email or password" });
     }
+
+    const isMatch = await bcrypt.compare(password, user.passwordHash);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+
+    const token = jwt.sign(
+      { id: user.userID, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    res.json({ message: "Logged in successfully", token: token, user: user });
+  } catch (error) {
+    console.error(`Error logging in user: ${error}`);
+    res.status(500).send("Error logging in user");
+  }
+});
+
+router.get("/me", async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findByPk(decoded.id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ user });
+  } catch (error) {
+    console.error(`Error fetching user details: ${error}`);
+    res.status(500).send("Error fetching user details");
+  }
 });
 
 module.exports = router;

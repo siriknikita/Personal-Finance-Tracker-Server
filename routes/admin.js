@@ -1,14 +1,15 @@
 const express = require("express");
 const router = express.Router();
 const bodyParser = require("body-parser");
-const database = require("../database");
+const service = require("../services/userService");
+const { getTotalUsersSpending } = require("../services/transactionService");
 
 router.use(bodyParser.json());
 router.use(express.json());
 
 router.get("/get/users", async (req, res) => {
   try {
-    const users = await database.getUsers();
+    const users = await service.getUsers();
     res.json({ users: users });
   } catch (error) {
     console.error(`Error getting users: ${error}`);
@@ -18,7 +19,7 @@ router.get("/get/users", async (req, res) => {
 
 router.get("/get/usersSpending", async (req, res) => {
   try {
-    const usersSpending = await database.getTotalUsersSpending();
+    const usersSpending = await getTotalUsersSpending();
     res.json({ usersSpending: usersSpending });
   } catch (error) {
     console.error(`Error getting users spending: ${error}`);

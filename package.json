@@ -13,6 +13,7 @@
   "dependencies": {
     "@azure/storage-blob": "^12.18.0",
     "applicationinsights": "^3.1.0",
+    "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -21,6 +22,7 @@
     "msnodesqlv8": "^4.1.2",
     "mssql": "^10.0.2",
     "mysql2": "^3.9.3",
+    "sequelize": "^6.37.3",
     "typescript": "^5.4.5"
   },
   "devDependencies": {

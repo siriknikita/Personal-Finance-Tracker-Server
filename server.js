@@ -13,6 +13,7 @@ appInsights.setup(process.env.AZURE_APPLICATION_INSIGHTS_CONNECTION_STRING)
 
 const express = require("express");
 const cors = require("cors");
+const { sequelize } = require("./models");
 
 const app = express();
 
@@ -56,6 +57,12 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/blob", blobRoutes);
 
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  console.log(`Server starts on port ${PORT}...`);
+
+sequelize.sync().then(() => {
+  console.log('Database synchronized');
+  app.listen(PORT, () => {
+      console.log(`Server starts on port ${PORT}...`);
+  });
+}).catch(err => {
+  console.error('Unable to connect to the database:', err);
 });
