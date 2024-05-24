@@ -11,6 +11,14 @@ async function getUser(email) {
   }
 }
 
+async function getUserByID(userID) {
+  try {
+    return await User.findOne({ where: { userID: userID } });
+  } catch (error) {
+    console.error("[GET USER BY ID] Error: " + error);
+  }
+}
+
 async function getUsers() {
   try {
     return await User.findAll();
@@ -57,6 +65,21 @@ async function loginUser(email, password, isGoogle=false) {
     }
   } catch (error) {
     console.error("[LOGIN USER] Error: " + error);
+  }
+}
+
+async function updateTotalSpent(userID, amount) {
+  try {
+    const user = await getUserByID(userID);
+    if (user) {
+      user.totalSpent += amount;
+      await user.save();
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error) {
+    console.error("[UPDATE TOTAL SPENT] Error: " + error);
   }
 }
 
@@ -110,6 +133,7 @@ module.exports = {
   getUsers,
   createUser,
   loginUser,
+  updateTotalSpent,
   updateEmail,
   updatePassword,
   updateUsername,

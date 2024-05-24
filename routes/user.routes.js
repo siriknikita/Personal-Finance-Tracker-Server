@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const bodyParser = require("body-parser");
+const service = require("../services/userService");
 
 router.use(bodyParser.json());
 router.use(express.json());
@@ -61,8 +62,7 @@ router.get("/get/:email", async (req, res) => {
  */
 router.post("/update/email", async (req, res) => {
   try {
-    const email = req.body.email;
-    const newEmail = req.body.newEmail;
+    const { email, newEmail } = req.body;
 
     const response = await service.updateEmail(email, newEmail);
     if (response) {
@@ -99,8 +99,8 @@ router.post("/update/email", async (req, res) => {
  */
 router.post("/update/password", async (req, res) => {
   try {
-    const email = req.body.email;
-    const newPasswordHash = req.body.newPasswordHash;
+    const { email, newPasswordHash } = req.body;
+
     const response = await service.updatePassword(email, newPasswordHash);
     if (response) {
       res.json({ message: "Password updated successfully" });
@@ -138,9 +138,7 @@ router.post("/update/password", async (req, res) => {
  */
 router.post("/update/username", async (req, res) => {
   try {
-    const email = req.body.email;
-    const currentUsername = req.body.currentUsername;
-    const newUsername = req.body.newUsername;
+    const { email, currentUsername, newUsername } = req.body;
 
     const response = await service.updateUsername(
       email,
