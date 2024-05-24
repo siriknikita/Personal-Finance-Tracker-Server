@@ -27,9 +27,11 @@ router.use(express.json());
  */
 router.get("/get/:userID", async (req, res) => {
   try {
-    const userID = req.params.userID;
+    const { userID } = req.params;
 
+    console.log("userID", userID);
     const goals = await service.getGoals(userID);
+    console.log("goals", goals);
     res.json({ goals: goals });
   } catch (error) {
     console.error(`Error getting goals: ${error}`);
@@ -65,9 +67,9 @@ router.get("/get/:userID", async (req, res) => {
  */
 router.post("/set", async (req, res) => {
   try {
-    const { userID, goalDescription, goalDate } = req.body;
+    const { userID, description, deadline } = req.body;
 
-    const response = await service.addGoal(userID, goalDescription, goalDate);
+    const response = await service.addGoal(userID, description, deadline );
     if (response) {
       res.json({ message: "Goal set successfully" });
     }

@@ -86,7 +86,6 @@ async function addTransaction(userID, amount, categoryID) {
 }
 
 async function getTransactionsByID(userID) {
-  console.error("[GET TRANSACTIONS BY ID] userID: " + userID);
   try {
     return await Transaction.findAll({ where: { userID } });
   } catch (error) {

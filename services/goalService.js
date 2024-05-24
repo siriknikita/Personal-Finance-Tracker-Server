@@ -16,7 +16,9 @@ async function addGoal(userID, description, deadline) {
 
 async function getGoals(userID) {
   try {
-    return await Goal.findAll({ where: { userID } });
+    const data = await Goal.findAll({ where: { userID: userID } });
+    console.log("goals", data);
+    return data;
   } catch (error) {
     console.error("[GET GOALS] Error: " + error);
   }

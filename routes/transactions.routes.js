@@ -8,7 +8,7 @@ router.use(express.json());
 
 /**
  * @swagger
- * /get/{userID}:
+ * /api/transactions/get/{userID}:
  *   get:
  *     summary: Retrieve transactions for a specific user
  *     tags: [Transactions]
@@ -39,7 +39,7 @@ router.get("/get/:userID", async (req, res) => {
 
 /**
  * @swagger
- * /get/moneySpent/{userID}:
+ * /api/transactions/get/moneySpent/{userID}:
  *   get:
  *     summary: Retrieve total money spent by a specific user
  *     tags: [Transactions]
@@ -70,7 +70,7 @@ router.get("/get/moneySpent/:userID", async (req, res) => {
 
 /**
  * @swagger
- * /get/moneySpent/categories/{userID}:
+ * /api/transactions/get/moneySpent/categories/{userID}:
  *   get:
  *     summary: Retrieve money spent on each category by a specific user
  *     tags: [Transactions]
@@ -103,7 +103,7 @@ router.get("/get/moneySpent/categories/:userID", async (req, res) => {
 
 /**
  * @swagger
- * /get/spendings/top5:
+ * /api/transactions/get/spendings/top5:
  *   get:
  *     summary: Retrieve the top 5 spending categories based on frequency
  *     tags: [Transactions]
@@ -127,7 +127,7 @@ router.get("/get/spendings/top5", async (req, res) => {
 
 /**
  * @swagger
- * /get/categories/{userID}:
+ * /api/transactions/get/categories/{userID}:
  *   get:
  *     summary: Retrieve transaction categories for a specific user
  *     tags: [Transactions]
@@ -158,7 +158,7 @@ router.get("/get/categories/:userID", async (req, res) => {
 
 /**
  * @swagger
- * /add:
+ * /api/transactions/add:
  *   post:
  *     summary: Add a new transaction
  *     tags: [Transactions]
