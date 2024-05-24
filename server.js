@@ -15,6 +15,8 @@ appInsights
 const express = require("express");
 const cors = require("cors");
 const { sequelize } = require("./models");
+const swaggerUI = require("swagger-ui-express");
+const swaggerSpec = require("./swagger");
 
 const app = express();
 
@@ -31,6 +33,7 @@ app.use(
   })
 );
 
+
 app.get("/", (req, res) => {
   try {
     res.send("Test Hello World from server!");
@@ -43,13 +46,14 @@ app.get("/", (req, res) => {
   }
 });
 
-const authRoutes = require("./routes/auth");
-const goalsRoutes = require("./routes/goals");
-const userRoutes = require("./routes/user");
-const transactionsRoutes = require("./routes/transactions");
-const adminRoutes = require("./routes/admin");
-const blobRoutes = require("./routes/blobStorage");
+const authRoutes = require("./routes/auth.routes");
+const goalsRoutes = require("./routes/goals.routes");
+const userRoutes = require("./routes/user.routes");
+const transactionsRoutes = require("./routes/transactions.routes");
+const adminRoutes = require("./routes/admin.routes");
+const blobRoutes = require("./routes/blobStorage.routes");
 
+app.use("/api/docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 app.use("/api/auth", authRoutes);
 app.use("/api/goals", goalsRoutes);
 app.use("/api/user", userRoutes);

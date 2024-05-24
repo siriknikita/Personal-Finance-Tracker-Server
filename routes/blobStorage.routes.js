@@ -1,12 +1,34 @@
 const express = require("express");
 const router = express.Router();
 const bodyParser = require("body-parser");
-const database = require("../database");
 const { uploadScreenshotToBlob } = require("../azureStorage");
 
 router.use(bodyParser.json());
 router.use(express.json());
 
+/**
+ * @swagger
+ * /api/blob/upload/screenshot:
+ *   post:
+ *     summary: Upload a screenshot to blob storage
+ *     tags: [BlobStorage]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               imageName:
+ *                 type: string
+ *               image:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Image uploaded successfully
+ *       500:
+ *         description: Error uploading image
+ */
 router.post("/upload/screenshot", async (req, res) => {
   try {
     const { imageName, image } = req.body;

@@ -8,24 +8,74 @@ const { User } = require("../models");
 router.use(bodyParser.json());
 router.use(express.json());
 
+/**
+ * @swagger
+ * /api/auth/register:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: User created successfully
+ *       400:
+ *         description: User already exists
+ *       500:
+ *         description: Error registering user
+ */
 router.post("/register", async (req, res) => {
   try {
     const { username, email, password } = req.body;
-
     const newUser = await createUser(username, email, password);
     if (newUser === "User already exists") {
       return res.status(400).json({ message: "User already exists" });
     }
-
-    res
-      .status(201)
-      .json({ message: "User created successfully", user: newUser });
+    res.status(201).json({ message: "User created successfully", user: newUser });
   } catch (error) {
     console.error(`Error registering user: ${error}`);
     res.status(500).send("Error registering user");
   }
 });
 
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Log in a user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               isGoogle:
+ *                 type: boolean
+ *     responses:
+ *       200:
+ *         description: Logged in successfully
+ *       400:
+ *         description: Invalid email or password
+ *       500:
+ *         description: Error logging in user
+ */
 router.post("/login", async (req, res) => {
   try {
     const { email, password, isGoogle } = req.body;
@@ -54,6 +104,22 @@ router.post("/login", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/auth/me:
+ *   get:
+ *     summary: Get user details
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User details
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Error fetching user details
+ */
 router.get("/me", async (req, res) => {
   try {
     const token = req.headers.authorization.split(" ")[1];
