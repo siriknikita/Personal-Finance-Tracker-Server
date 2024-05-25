@@ -53,10 +53,10 @@ router.get("/get/:userID", async (req, res) => {
  *             type: object
  *             properties:
  *               userID:
+ *                 type: number
+ *               description:
  *                 type: string
- *               goalDescription:
- *                 type: string
- *               goalDate:
+ *               deadline:
  *                 type: string
  *                 format: date
  *     responses:

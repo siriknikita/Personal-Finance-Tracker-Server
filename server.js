@@ -33,7 +33,6 @@ app.use(
   })
 );
 
-
 app.get("/", (req, res) => {
   try {
     res.send("Test Hello World from server!");

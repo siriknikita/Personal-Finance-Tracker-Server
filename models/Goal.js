@@ -23,7 +23,7 @@ const Goal = sequelize.define(
       allowNull: false,
     },
     deadline: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
   },

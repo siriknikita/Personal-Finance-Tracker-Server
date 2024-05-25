@@ -1,7 +1,10 @@
+const moment = require("moment");
 const { Goal } = require("../models");
 
 async function addGoal(userID, description, deadline) {
   try {
+    deadline = moment(deadline).format("yyyy-MM-DD");
+
     const newGoal = await Goal.create({
       userID,
       description,
@@ -16,9 +19,8 @@ async function addGoal(userID, description, deadline) {
 
 async function getGoals(userID) {
   try {
-    const data = await Goal.findAll({ where: { userID: userID } });
-    console.log("goals", data);
-    return data;
+    const goals = await Goal.findAll({ where: { userID: userID } });
+    return goals;
   } catch (error) {
     console.error("[GET GOALS] Error: " + error);
   }
