@@ -96,7 +96,9 @@ router.post("/login", async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
+    console.log("The token is: ", token);
 
+    res.cookie("token", token, { httpOnly: true });
     res.json({ message: "Logged in successfully", token: token, user: user });
   } catch (error) {
     console.error(`Error logging in user: ${error}`);

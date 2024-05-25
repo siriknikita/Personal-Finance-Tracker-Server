@@ -51,14 +51,15 @@ const userRoutes = require("./routes/user.routes");
 const transactionsRoutes = require("./routes/transactions.routes");
 const adminRoutes = require("./routes/admin.routes");
 const blobRoutes = require("./routes/blobStorage.routes");
+const { cookieJWTAuth } = require("./middleware/cookieJWTAuth");
 
 app.use("/api/docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 app.use("/api/auth", authRoutes);
-app.use("/api/goals", goalsRoutes);
-app.use("/api/user", userRoutes);
-app.use("/api/transactions", transactionsRoutes);
+app.use("/api/goals", cookieJWTAuth, goalsRoutes);
+app.use("/api/user", cookieJWTAuth, userRoutes);
+app.use("/api/transactions", cookieJWTAuth, transactionsRoutes);
 app.use("/api/admin", adminRoutes);
-app.use("/api/blob", blobRoutes);
+app.use("/api/blob", cookieJWTAuth, blobRoutes);
 
 const PORT = process.env.PORT || 8080;
 
