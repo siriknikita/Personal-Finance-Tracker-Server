@@ -81,12 +81,7 @@ router.post("/login", async (req, res) => {
     const { email, password, isGoogle } = req.body;
     const user = await loginUser(email, password, isGoogle);
 
-    if (!user) {
-      return res.status(400).json({ message: "Invalid email or password" });
-    }
-
-    const isMatch = password === user.passwordHash;
-    if (!isMatch && !isGoogle) {
+    if (!user && (!(password === user.passwordHash) && !isGoogle)) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
     console.log("The passwords did match");

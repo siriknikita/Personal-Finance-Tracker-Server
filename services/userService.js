@@ -52,17 +52,19 @@ async function createUser(username, email, passwordHash) {
 async function loginUser(email, password, isGoogle=false) {
   try {
     const userData = await getUser(email);
-    if (userData && isGoogle) {
-      userData.isAuthorized = true;
-      await userData.save()
-      return userData.dataValues;
-    } else if (userData && !isGoogle && userData.passwordHash === password) {
-      userData.isAuthorized = true;
-      await userData.save()
-      return userData.dataValues;
-    } else {
+    // If the user is logging in with Google, we don't need to check the password
+    // If the data doesn't exist, we can't log in
+    if (!(userData && !isGoogle)) {
       return null;
     }
+    if ((userData && !isGoogle) && (userData.passwordHash === password)) {
+      return null;
+    }
+
+    userData.isAuthorized = true;
+    await userData.save()
+    const user = await getUser(email);
+    return user.dataValues;
   } catch (error) {
     console.error("[LOGIN USER] Error: " + error);
   }
