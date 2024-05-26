@@ -29,9 +29,7 @@ router.get("/get/:userID", async (req, res) => {
   try {
     const { userID } = req.params;
 
-    console.log("userID", userID);
     const goals = await service.getGoals(userID);
-    console.log("goals", goals);
     res.json({ goals: goals });
   } catch (error) {
     console.error(`Error getting goals: ${error}`);

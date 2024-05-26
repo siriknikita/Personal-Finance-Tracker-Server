@@ -42,7 +42,9 @@ router.post("/register", async (req, res) => {
     if (newUser === "User already exists") {
       return res.status(400).json({ message: "User already exists" });
     }
-    res.status(201).json({ message: "User created successfully", user: newUser });
+    res
+      .status(201)
+      .json({ message: "User created successfully", user: newUser });
   } catch (error) {
     console.error(`Error registering user: ${error}`);
     res.status(500).send("Error registering user");
@@ -78,28 +80,34 @@ router.post("/register", async (req, res) => {
  */
 router.post("/login", async (req, res) => {
   try {
-    const { email, password, isGoogle } = req.body;
-    const user = await loginUser(email, password, isGoogle);
+    const { email, isGoogle, passwordHash } = req.body;
+    const user = await loginUser(email, passwordHash, isGoogle);
 
-    if (!user && (!(password === user.passwordHash) && !isGoogle)) {
+    if (!user || (!(passwordHash === user.passwordHash) && !isGoogle)) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
-    console.log("The passwords did match");
 
     const token = jwt.sign(
-      { id: user.userID, email: user.email },
+      user,
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1d" }
     );
-    console.log("The token is: ", token);
 
-    res.cookie("token", token, { httpOnly: true });
-    res.json({ message: "Logged in successfully", token: token, user: user });
+    const cookieOptions = {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict'
+    };
+
+    res.cookie("token", token, cookieOptions).json({ message: "Logged in successfully", token: token, user: user });
   } catch (error) {
     console.error(`Error logging in user: ${error}`);
     res.status(500).send("Error logging in user");
   }
 });
+
+
 
 /**
  * @swagger

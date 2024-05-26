@@ -21,18 +21,13 @@ if (routeFiles.length === 0) {
     throw new Error(`No .routes.js files found in routes directory: ${routesPath}`);
 }
 
-// console.log("Route files found:", routeFiles);
-
 const options = {
     swaggerDefinition,
     apis: routeFiles.map(file => path.join(routesPath, file)),
 };
 
-// console.log("Swagger options:", options);
-
 try {
     const swaggerSpec = swaggerJSDoc(options);
-    // console.log("Generated Swagger spec:", swaggerSpec);
     module.exports = swaggerSpec;
 } catch (error) {
     console.error("Error generating Swagger specification:", error);

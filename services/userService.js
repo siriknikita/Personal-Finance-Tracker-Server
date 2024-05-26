@@ -57,10 +57,9 @@ async function loginUser(email, password, isGoogle=false) {
     if (!(userData && !isGoogle)) {
       return null;
     }
-    if ((userData && !isGoogle) && (userData.passwordHash === password)) {
+    if (!(userData && !isGoogle) && (userData.passwordHash === password)) {
       return null;
     }
-
     userData.isAuthorized = true;
     await userData.save()
     const user = await getUser(email);
