@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
+const moment = require("moment");
 const { createUser, loginUser } = require("../services/userService");
 const { User } = require("../models");
 
@@ -37,12 +38,18 @@ router.use(express.json());
  */
 router.post("/register", async (req, res) => {
   try {
-    const { username, email, password } = req.body;
-    
+    const { username, email, isGoogle } = req.body;
+    const password = isGoogle ? "" : req.body.password;
+
     const newUser = await createUser(username, email, password);
     if (newUser === "User already exists") {
       return res.status(400).json({ message: "User already exists" });
     }
+
+    if (isGoogle) {
+      await sendGreetingEmail(newUser.email);
+    }
+
     res
       .status(201)
       .json({ message: "User created successfully", user: newUser });
@@ -88,27 +95,23 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    const token = jwt.sign(
-      user,
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
+    const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: "1d" });
 
     const cookieOptions = {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'None'
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "None",
     };
 
-    res.cookie("token", token, cookieOptions).json({ message: "Logged in successfully", token: token, user: user });
+    res
+      .cookie("token", token, cookieOptions)
+      .json({ message: "Logged in successfully", token: token, user: user });
   } catch (error) {
     console.error(`Error logging in user: ${error}`);
     res.status(500).send("Error logging in user");
   }
 });
-
-
 
 /**
  * @swagger

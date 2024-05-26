@@ -29,7 +29,7 @@ async function getUsers() {
 }
 
 
-async function createUser(username, email, password) {
+async function createUser(username, email, password, isGoogle = false) {
   try {
     const existingUser = await getUser(email);
     if (existingUser) {
@@ -41,13 +41,13 @@ async function createUser(username, email, password) {
     const newUser = await User.create({
       username,
       email,
-      passwordHash,
+      passwordHash: isGoogle ? "": passwordHash,
       registrationDate: moment().toDate(),
       isAuthorized: true,
       isAdmin: false,
     });
 
-    return newUser;
+    return newUser.dataValues;
   } catch (error) {
     console.error("[CREATE USER] Error: " + error);
   }
