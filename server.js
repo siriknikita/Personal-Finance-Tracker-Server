@@ -17,12 +17,12 @@ const cors = require("cors");
 const { sequelize } = require("./models");
 const swaggerUI = require("swagger-ui-express");
 const swaggerSpec = require("./swagger");
-const cookieParser = require("cookie-parser");
+const cookieParser = require('cookie-parser');
 const app = express();
 
 app.use((req, res, next) => {
-  res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
-  res.setHeader("Cross-Origin-Resource-Policy", "same-origin");
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
   next();
 });
 
