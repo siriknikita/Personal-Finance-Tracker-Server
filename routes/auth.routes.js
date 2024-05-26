@@ -38,6 +38,7 @@ router.use(express.json());
 router.post("/register", async (req, res) => {
   try {
     const { username, email, password } = req.body;
+    
     const newUser = await createUser(username, email, password);
     if (newUser === "User already exists") {
       return res.status(400).json({ message: "User already exists" });
@@ -66,7 +67,7 @@ router.post("/register", async (req, res) => {
  *             properties:
  *               email:
  *                 type: string
- *               password:
+ *               passwordHash:
  *                 type: string
  *               isGoogle:
  *                 type: boolean
@@ -80,10 +81,10 @@ router.post("/register", async (req, res) => {
  */
 router.post("/login", async (req, res) => {
   try {
-    const { email, isGoogle, passwordHash } = req.body;
-    const user = await loginUser(email, passwordHash, isGoogle);
+    const { email, isGoogle, passwordHash: password } = req.body;
+    const user = await loginUser(email, password, isGoogle);
 
-    if (!user || (!(passwordHash === user.passwordHash) && !isGoogle)) {
+    if (!user && !isGoogle) {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 

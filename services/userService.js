@@ -1,6 +1,7 @@
 const { User } = require("../models");
 const moment = require("moment");
 require("dotenv").config();
+const bcrypt = require("bcryptjs");
 
 async function getUser(email) {
   try {
@@ -27,13 +28,16 @@ async function getUsers() {
   }
 }
 
-async function createUser(username, email, passwordHash) {
+
+async function createUser(username, email, password) {
   try {
     const existingUser = await getUser(email);
     if (existingUser) {
       return "User already exists";
     }
 
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, salt);
     const newUser = await User.create({
       username,
       email,
@@ -49,25 +53,27 @@ async function createUser(username, email, passwordHash) {
   }
 }
 
-async function loginUser(email, password, isGoogle=false) {
+async function loginUser(email, password, isGoogle = false) {
   try {
     const userData = await getUser(email);
     // If the user is logging in with Google, we don't need to check the password
-    // If the data doesn't exist, we can't log in
-    if (!(userData && !isGoogle)) {
+    if (!userData) {
       return null;
     }
-    if (!(userData && !isGoogle) && (userData.passwordHash === password)) {
-      return null;
+    if (!isGoogle) {
+      const passwordMatch = await bcrypt.compare(password, userData.dataValues.passwordHash);
+      if (!passwordMatch) {
+        return null;
+      }
     }
     userData.isAuthorized = true;
-    await userData.save()
-    const user = await getUser(email);
-    return user.dataValues;
+    await userData.save();
+    return userData.dataValues;
   } catch (error) {
     console.error("[LOGIN USER] Error: " + error);
   }
 }
+
 
 async function updateTotalSpent(userID, amount) {
   try {
