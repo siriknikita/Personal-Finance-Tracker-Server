@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
-const moment = require("moment");
+const { sendGreetingEmail } = require("../services/sendEmail");
 const { createUser, loginUser } = require("../services/userService");
 const { User } = require("../models");
 
@@ -38,8 +38,8 @@ router.use(express.json());
  */
 router.post("/register", async (req, res) => {
   try {
-    const { username, email, isGoogle } = req.body;
-    const password = isGoogle ? "" : req.body.password;
+    console.log(req.body);
+    const { username, email, passwordHash: password, isGoogle } = req.body;
 
     const newUser = await createUser(username, email, password);
     if (newUser === "User already exists") {

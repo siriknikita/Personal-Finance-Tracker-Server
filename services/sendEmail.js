@@ -67,4 +67,8 @@ async function sendSuccessTransactionEmail(recipient_email) {
   }
 }
 
-module.exports = { sendEmail: sendGreetingEmail, sendSupportEmail, sendSuccessTransactionEmail };
+module.exports = {
+  sendGreetingEmail,
+  sendSupportEmail,
+  sendSuccessTransactionEmail,
+};
