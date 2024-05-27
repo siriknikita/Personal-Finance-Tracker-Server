@@ -17,11 +17,11 @@ const cors = require("cors");
 const { sequelize } = require("./models");
 const swaggerUI = require("swagger-ui-express");
 const swaggerSpec = require("./swagger");
-const cookieParser = require('cookie-parser');
+const cookieParser = require("cookie-parser");
 const app = express();
 
 app.use((req, res, next) => {
-  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
   // res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
   next();
 });
@@ -48,12 +48,12 @@ app.get("/", (req, res) => {
   }
 });
 
-const authRoutes = require("./routes/auth.routes");
-const goalsRoutes = require("./routes/goals.routes");
-const userRoutes = require("./routes/user.routes");
-const transactionsRoutes = require("./routes/transactions.routes");
-const adminRoutes = require("./routes/admin.routes");
-const blobRoutes = require("./routes/blobStorage.routes");
+const authRoutes = require("./routes/auth.route");
+const goalsRoutes = require("./routes/goals.route");
+const userRoutes = require("./routes/user.route");
+const transactionsRoutes = require("./routes/transactions.route");
+const adminRoutes = require("./routes/admin.route");
+const blobRoutes = require("./routes/blobStorage.route");
 const { cookieJWTAuth } = require("./middleware/cookieJWTAuth");
 
 app.use("/api/docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
