@@ -1,5 +1,7 @@
 const nodemailer = require("nodemailer");
 require("dotenv").config();
+const { getMonthlyLimitByUserID, getTotalSpentByUserID } = require("./budget.controller");
+const { getUserIDByEmail } = require("./user.controller");
 
 const transporter = nodemailer.createTransport({
   service: "outlook",
@@ -72,8 +74,7 @@ async function sendFeedbackEmail(req, res) {
     return res
       .status(200)
       .send({ message: "Feedback email has been successfully sended" });
-  }
-  catch (error) {
+  } catch (error) {
     console.error("Error sending email:", error);
     return res
       .status(400)
@@ -81,8 +82,31 @@ async function sendFeedbackEmail(req, res) {
   }
 }
 
+async function sendBudgetLimitExceededEmail(email) {
+  const userID = await getUserIDByEmail(email);
+  const monthlyLimit = await getMonthlyLimitByUserID(userID);
+  const totalSpent = await getTotalSpentByUserID(userID);
+  const exceededAmount = totalSpent - monthlyLimit;
+
+  try {
+    await transporter.sendMail({
+      from: process.env.NODEMAILER_USER,
+      to: email,
+      subject: "Budget Limit Exceeded",
+      text: "You have exceeded your monthly limit.",
+      html:
+        `<p>Hey! You have exceeded your monthly limit by $${exceededAmount}. Your monthly limit is $` +
+        monthlyLimit +
+        ".</p>",
+    });
+  } catch (error) {
+    console.error("Error sending email:", error);
+  }
+}
+
 module.exports = {
   sendGreetingEmail,
   sendSupportEmail,
   sendFeedbackEmail,
+  sendBudgetLimitExceededEmail,
 };

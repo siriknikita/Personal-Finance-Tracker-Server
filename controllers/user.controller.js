@@ -22,6 +22,16 @@ const getUserByID = async (userID) => {
   }
 }
 
+const getUserIDByEmail = async (email) => {
+  try {
+    const user = await getUser(email);
+    return user ? user.dataValues.userID : null;
+  } catch (error) {
+    console.log("Error in getUserIDByEmail controller" + error);
+    throw new Error("Error in getUserIDByEmail controller: " + error);
+  }
+}
+
 const getUsers = async () => {
   try {
     return await User.findAll();
@@ -147,6 +157,7 @@ const updateUsername = async (email, currentUsername, newUsername) => {
 module.exports = {
   getUser,
   getUserByID,
+  getUserIDByEmail,
   getUsers,
   createUser,
   loginUser,
