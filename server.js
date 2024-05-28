@@ -19,6 +19,8 @@ const swaggerUI = require("swagger-ui-express");
 const swaggerSpec = require("./swagger");
 const cookieParser = require("cookie-parser");
 const app = express();
+const multer = require("multer");
+const upload = multer();
 
 app.use((req, res, next) => {
   res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
