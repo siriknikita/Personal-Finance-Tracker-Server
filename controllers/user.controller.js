@@ -2,6 +2,55 @@ const { User } = require("../models");
 const moment = require("moment");
 require("dotenv").config();
 const bcrypt = require("bcryptjs");
+const { createUserBudget, updateBudget } = require("./budget.controller");
+
+const createUser = async (username, email, password, isGoogle = false) => {
+  try {
+    const existingUser = await getUser(email);
+    if (existingUser) {
+      return "User already exists";
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, salt);
+    const newUser = await User.create({
+      username,
+      email,
+      passwordHash: isGoogle ? "": passwordHash,
+      registrationDate: moment().toDate(),
+      isAuthorized: true,
+      isAdmin: false,
+    });
+
+    await createUserBudget(newUser.dataValues.userID);
+
+    return newUser.dataValues;
+  } catch (error) {
+    console.log("Error in createUser controller" + error);
+    throw new Error("Error in createUser controller: " + error);
+  }
+}
+
+const loginUser = async (email, password, isGoogle = false) => {
+  try {
+    const userData = await getUser(email);
+    if (!userData) {
+      return null;
+    }
+    if (!isGoogle) {
+      const passwordMatch = await bcrypt.compare(password, userData.dataValues.passwordHash);
+      if (!passwordMatch) {
+        return null;
+      }
+    }
+    userData.isAuthorized = true;
+    await userData.save();
+    return userData.dataValues;
+  } catch (error) {
+    console.log("Error in loginUser controller" + error);
+    throw new Error("Error in loginUser controller: " + error);
+  }
+}
 
 const getUser = async (email) => {
   try {
@@ -15,7 +64,7 @@ const getUser = async (email) => {
 
 const getUserByID = async (userID) => {
   try {
-    return await User.findOne({ where: { userID: userID } });
+    return await User.findOne({ where: { userID } });
   } catch (error) {
     console.log("Error in getUserByID controller" + error);
     throw new Error("Error in getUserByID controller: " + error);
@@ -41,65 +90,19 @@ const getUsers = async () => {
   }
 }
 
-
-const createUser = async (username, email, password, isGoogle = false) => {
-  try {
-    const existingUser = await getUser(email);
-    if (existingUser) {
-      return "User already exists";
-    }
-
-    const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(password, salt);
-    const newUser = await User.create({
-      username,
-      email,
-      passwordHash: isGoogle ? "": passwordHash,
-      registrationDate: moment().toDate(),
-      isAuthorized: true,
-      isAdmin: false,
-    });
-
-    return newUser.dataValues;
-  } catch (error) {
-    console.log("Error in createUser controller" + error);
-    throw new Error("Error in createUser controller: " + error);
-  }
-}
-
-const loginUser = async (email, password, isGoogle = false) => {
-  try {
-    const userData = await getUser(email);
-    // If the user is logging in with Google, we don't need to check the password
-    if (!userData) {
-      return null;
-    }
-    if (!isGoogle) {
-      const passwordMatch = await bcrypt.compare(password, userData.dataValues.passwordHash);
-      if (!passwordMatch) {
-        return null;
-      }
-    }
-    userData.isAuthorized = true;
-    await userData.save();
-    return userData.dataValues;
-  } catch (error) {
-    console.log("Error in loginUser controller" + error);
-    throw new Error("Error in loginUser controller: " + error);
-  }
-}
-
-
 const updateTotalSpent = async (userID, amount) => {
   try {
     const user = await getUserByID(userID);
-    if (user) {
-      user.totalSpent += amount;
-      await user.save();
-      return true;
-    } else {
+    if (!user) {
       return false;
     }
+
+    const budget = await updateBudget(userID, amount);
+    if (!budget) {
+      return false;
+    }
+
+    return true;
   } catch (error) {
     console.log("Error in updateTotalSpent controller" + error);
     throw new Error("Error in updateTotalSpent controller: " + error);

@@ -39,24 +39,10 @@ const getTransactionCategoriesByUserID = async (userID) => {
   return categoriesList;
 };
 
-const getCategoriesList = async () => {
-  try {
-    return await Category.findAll();
-  } catch (error) {
-    console.log("Error in getCategoriesList controller: " + error);
-    throw new Error("Error in getCategoriesList controller: " + error);
-  }
-};
-
-const getUniqueCategoriesList = async (userID) => {
-  const categories = await getTransactionCategoriesByUserID(userID);
-  return Array.from(new Set(categories));
-};
-
 const getTransactionMoneyByUserID = async (userID) => {
   try {
     const transactions = await Transaction.findAll({
-      where: { userID: userID },
+      where: { userID },
       attributes: ["amount"],
     });
 
@@ -230,8 +216,6 @@ module.exports = {
   getTransactionCategoriesIDByUserID,
   getCategoryNameByID,
   getTransactionCategoriesByUserID,
-  getCategoriesList,
-  getUniqueCategoriesList,
   getTransactionMoneyByUserID,
   getMoneySpentOnEachCategory,
   addTransaction,

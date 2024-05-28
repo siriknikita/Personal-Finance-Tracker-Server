@@ -1,7 +1,6 @@
 const nodemailer = require("nodemailer");
 require("dotenv").config();
-const { getMonthlyLimitByUserID, getTotalSpentByUserID } = require("./budget.controller");
-const { getUserIDByEmail } = require("./user.controller");
+const { budgetController, userController } = require("./index");
 
 const transporter = nodemailer.createTransport({
   service: "outlook",
@@ -83,9 +82,9 @@ async function sendFeedbackEmail(req, res) {
 }
 
 async function sendBudgetLimitExceededEmail(email) {
-  const userID = await getUserIDByEmail(email);
-  const monthlyLimit = await getMonthlyLimitByUserID(userID);
-  const totalSpent = await getTotalSpentByUserID(userID);
+  const userID = await userController.getUserIDByEmail(email);
+  const monthlyLimit = await budgetController.getMonthlyLimitByUserID(userID);
+  const totalSpent = await budgetController.getTotalSpentByUserID(userID);
   const exceededAmount = totalSpent - monthlyLimit;
 
   try {
