@@ -36,7 +36,7 @@ const getMonthlyLimitByUserID = async (userID) => {
       throw new Error("Budget not found");
     }
 
-    return budget.monthlyLimit;
+    return budget.dataValues.monthlyLimit;
   } catch (error) {
     console.log("Error in getMonthlyLimitByUserID controller" + error);
     throw new Error("Error in getMonthlyLimitByUserID controller: " + error);
@@ -51,7 +51,7 @@ const getTotalSpentByUserID = async (userID) => {
       throw new Error("Budget not found");
     }
 
-    return budget.totalSpent;
+    return budget.dataValues.totalSpent;
   } catch (error) {
     console.log("Error in getTotalSpentByUserID controller" + error);
     throw new Error("Error in getTotalSpentByUserID controller: " + error);
