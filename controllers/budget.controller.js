@@ -8,6 +8,8 @@ const createUserBudget = async (userID) => {
       userID,
     });
 
+    await newBudget.save();
+
     return newBudget;
   } catch (error) {
     console.log("Error in createUserBudget controller" + error);

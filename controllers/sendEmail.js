@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 require("dotenv").config();
-const { budgetController, userController } = require("./index");
+const { budgetController, userController } = require("../controllers");
 
 const transporter = nodemailer.createTransport({
   service: "outlook",

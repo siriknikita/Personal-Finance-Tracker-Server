@@ -1,4 +1,4 @@
-const { Transaction, Category, User } = require("../models");
+const { Transaction, Category } = require("../models");
 const { budgetController, categoryController } = require("../controllers");
 
 const getTransactionCategoriesIDByUserID = async (userID) => {
