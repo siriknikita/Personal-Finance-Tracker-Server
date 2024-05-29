@@ -37,7 +37,6 @@ router.use(express.json());
  */
 router.post("/register", async (req, res) => {
   try {
-    console.log(req.body);
     const { username, email, passwordHash: password, isGoogle } = req.body;
 
     const newUser = await userController.createUser(username, email, password);
