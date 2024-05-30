@@ -1,7 +1,7 @@
 const moment = require("moment");
 const { Budget } = require("../models");
 const { sendBudgetLimitExceededEmail } = require("./sendEmail");
-const userController = require("./user.controller");
+const { getEmailByUserID } = require("./user.controller");
 
 const createUserBudget = async (userID) => {
   try {
@@ -89,7 +89,7 @@ const updateBudget = async (userID, amount) => {
     );
 
     if (newTotalSpent > budget.dataValues.monthlyLimit) {
-      const email = await userController.getEmailByUserID(userID);
+      const email = await getEmailByUserID(userID);
       await sendBudgetLimitExceededEmail(email);
     }
 
