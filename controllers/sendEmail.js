@@ -94,9 +94,7 @@ async function sendBudgetLimitExceededEmail(email) {
       subject: "Budget Limit Exceeded",
       text: "You have exceeded your monthly limit.",
       html:
-        `<p>Hey! You have exceeded your monthly limit by $${exceededAmount}. Your monthly limit is $` +
-        monthlyLimit +
-        ".</p>",
+        `<p>Hey! You have exceeded your monthly limit by $${exceededAmount}. Your monthly limit is $${monthlyLimit}.</p>`
     });
   } catch (error) {
     console.error("Error sending email:", error);

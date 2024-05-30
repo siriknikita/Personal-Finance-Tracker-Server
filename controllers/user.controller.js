@@ -81,6 +81,16 @@ const getUserIDByEmail = async (email) => {
   }
 }
 
+const getEmailByUserID = async (userID) => {
+  try {
+    const user = await getUserByID(userID);
+    return user ? user.dataValues.email : null;
+  } catch (error) {
+    console.log("Error in getEmailByUserID controller" + error);
+    throw new Error("Error in getEmailByUserID controller: " + error);
+  }
+}
+
 const getUsers = async () => {
   try {
     return await User.findAll();
@@ -161,6 +171,7 @@ module.exports = {
   getUser,
   getUserByID,
   getUserIDByEmail,
+  getEmailByUserID,
   getUsers,
   createUser,
   loginUser,
