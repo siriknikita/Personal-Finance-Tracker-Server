@@ -1,7 +1,7 @@
 const moment = require("moment");
 const { Budget } = require("../models");
 const { sendBudgetLimitExceededEmail } = require("./sendEmail");
-const { userController } = require("./user.controller");
+const userController = require("./user.controller");
 
 const createUserBudget = async (userID) => {
   try {
