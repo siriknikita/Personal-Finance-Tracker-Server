@@ -2,7 +2,7 @@ const { User } = require("../models");
 const moment = require("moment");
 require("dotenv").config();
 const bcrypt = require("bcryptjs");
-const { createUserBudget, updateBudget } = require("./budget.controller");
+const { createUserBudget } = require("./budget.controller");
 
 const createUser = async (username, email, password, isGoogle = false) => {
   try {
@@ -31,6 +31,16 @@ const createUser = async (username, email, password, isGoogle = false) => {
   }
 }
 
+const getUser = async (email) => {
+  try {
+    const isAdmin = email === process.env.ADMIN_EMAIL;
+    return await User.findOne({ where: { email: email, isAdmin: isAdmin } });
+  } catch (error) {
+    console.log("Error in getUser controller" + error);
+    throw new Error("Error in getUser controller: " + error);
+  }
+}
+
 const loginUser = async (email, password, isGoogle = false) => {
   try {
     const userData = await getUser(email);
@@ -52,16 +62,6 @@ const loginUser = async (email, password, isGoogle = false) => {
   }
 }
 
-const getUser = async (email) => {
-  try {
-    const isAdmin = email === process.env.ADMIN_EMAIL;
-    return await User.findOne({ where: { email: email, isAdmin: isAdmin } });
-  } catch (error) {
-    console.log("Error in getUser controller" + error);
-    throw new Error("Error in getUser controller: " + error);
-  }
-}
-
 const getUserByID = async (userID) => {
   try {
     return await User.findOne({ where: { userID } });
@@ -74,7 +74,7 @@ const getUserByID = async (userID) => {
 const getUserIDByEmail = async (email) => {
   try {
     const user = await getUser(email);
-    return user ? user.dataValues.userID : null;
+    return user.dataValues.userID;
   } catch (error) {
     console.log("Error in getUserIDByEmail controller" + error);
     throw new Error("Error in getUserIDByEmail controller: " + error);
@@ -84,7 +84,7 @@ const getUserIDByEmail = async (email) => {
 const getEmailByUserID = async (userID) => {
   try {
     const user = await getUserByID(userID);
-    return user ? user.dataValues.email : null;
+    return user.dataValues.email;
   } catch (error) {
     console.log("Error in getEmailByUserID controller" + error);
     throw new Error("Error in getEmailByUserID controller: " + error);
@@ -97,25 +97,6 @@ const getUsers = async () => {
   } catch (error) {
     console.log("Error in getUsers controller" + error);
     throw new Error("Error in getUsers controller: " + error);
-  }
-}
-
-const updateTotalSpent = async (userID, amount) => {
-  try {
-    const user = await getUserByID(userID);
-    if (!user) {
-      return false;
-    }
-
-    const budget = await updateBudget(userID, amount);
-    if (!budget) {
-      return false;
-    }
-
-    return true;
-  } catch (error) {
-    console.log("Error in updateTotalSpent controller" + error);
-    throw new Error("Error in updateTotalSpent controller: " + error);
   }
 }
 
@@ -168,14 +149,13 @@ const updateUsername = async (email, currentUsername, newUsername) => {
 }
 
 module.exports = {
+  createUser,
   getUser,
+  loginUser,
   getUserByID,
   getUserIDByEmail,
   getEmailByUserID,
   getUsers,
-  createUser,
-  loginUser,
-  updateTotalSpent,
   updateEmail,
   updatePassword,
   updateUsername,

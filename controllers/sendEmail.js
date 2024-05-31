@@ -1,6 +1,5 @@
 const nodemailer = require("nodemailer");
 require("dotenv").config();
-const { budgetController, userController } = require("../controllers");
 
 const transporter = nodemailer.createTransport({
   service: "outlook",
@@ -82,6 +81,8 @@ async function sendFeedbackEmail(req, res) {
 }
 
 async function sendBudgetLimitExceededEmail(email) {
+  const userController = require("./user.controller");
+  const budgetController = require("./budget.controller");
   const userID = await userController.getUserIDByEmail(email);
   const monthlyLimit = await budgetController.getMonthlyLimitByUserID(userID);
   const totalSpent = await budgetController.getTotalSpentByUserID(userID);
