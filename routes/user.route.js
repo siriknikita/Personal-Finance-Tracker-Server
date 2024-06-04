@@ -74,6 +74,13 @@ router.post("/update/email", async (req, res) => {
       res.status(400).json({ message: "Email and new email are required" });
     }
 
+    const userData = await userController.getUser(email);
+    const user = userData.dataValues;
+
+    if (user.email !== email) {
+      res.status(400).json({ message: "Email does not match" });
+    }
+
     const response = await userController.updateEmail(email, newEmail);
 
     if (!response) {
@@ -112,14 +119,14 @@ router.post("/update/email", async (req, res) => {
  */
 router.post("/update/password", async (req, res) => {
   try {
-    const { email, newPasswordHash } = req.body;
-    if (!email || !newPasswordHash) {
+    const { email, newPassword } = req.body;
+    if (!email || !newPassword) {
       res.status(400).json({ message: "Email and new password are required" });
     }
 
     const response = await userController.updatePassword(
       email,
-      newPasswordHash
+     newPassword 
     );
     if (!response) {
       res.status(400).json({ message: "User not found" });
@@ -159,18 +166,19 @@ router.post("/update/password", async (req, res) => {
  */
 router.post("/update/username", async (req, res) => {
   try {
-    const { email, currentUsername, newUsername } = req.body;
-    if (!email || !currentUsername || !newUsername) {
-      res.status(400).json({ message: "Email, current username, and new username are required" });
+    const { email, newUsername } = req.body;
+    console.log(email, newUsername);
+    if (!email | !newUsername) {
+      res.status(400).json({ message: "Error! Email, current username, and new username are required" });
     }
 
     const response = await userController.updateUsername(
       email,
-      currentUsername,
       newUsername
     );
+    console.log(response);
     if (!response) {
-      res.status(400).json({ message: "User not found" });
+      res.status(400).json({ message: "Error! User not found" });
     }
 
     res.status(200).json({ message: "Username updated successfully" });

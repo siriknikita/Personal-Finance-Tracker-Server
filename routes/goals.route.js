@@ -66,7 +66,6 @@ router.get("/get/:userID", async (req, res) => {
 router.post("/set", async (req, res) => {
   try {
     const { userID, goal, deadline } = req.body;
-    console.log(req.body);
 
     const response = await goalController.addGoal(
       userID,

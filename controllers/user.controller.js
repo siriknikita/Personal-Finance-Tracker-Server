@@ -16,7 +16,7 @@ const createUser = async (username, email, password, isGoogle = false) => {
     const newUser = await User.create({
       username,
       email,
-      passwordHash: isGoogle ? "": passwordHash,
+      passwordHash: isGoogle ? "" : passwordHash,
       registrationDate: moment().toDate(),
       isAuthorized: true,
       isAdmin: false,
@@ -29,7 +29,7 @@ const createUser = async (username, email, password, isGoogle = false) => {
     console.log("Error in createUser controller" + error);
     throw new Error("Error in createUser controller: " + error);
   }
-}
+};
 
 const getUser = async (email) => {
   try {
@@ -39,7 +39,7 @@ const getUser = async (email) => {
     console.log("Error in getUser controller" + error);
     throw new Error("Error in getUser controller: " + error);
   }
-}
+};
 
 const loginUser = async (email, password, isGoogle = false) => {
   try {
@@ -48,7 +48,10 @@ const loginUser = async (email, password, isGoogle = false) => {
       return null;
     }
     if (!isGoogle) {
-      const passwordMatch = await bcrypt.compare(password, userData.dataValues.passwordHash);
+      const passwordMatch = await bcrypt.compare(
+        password,
+        userData.dataValues.passwordHash
+      );
       if (!passwordMatch) {
         return null;
       }
@@ -60,7 +63,7 @@ const loginUser = async (email, password, isGoogle = false) => {
     console.log("Error in loginUser controller" + error);
     throw new Error("Error in loginUser controller: " + error);
   }
-}
+};
 
 const getUserByID = async (userID) => {
   try {
@@ -69,7 +72,7 @@ const getUserByID = async (userID) => {
     console.log("Error in getUserByID controller" + error);
     throw new Error("Error in getUserByID controller: " + error);
   }
-}
+};
 
 const getUserIDByEmail = async (email) => {
   try {
@@ -79,7 +82,7 @@ const getUserIDByEmail = async (email) => {
     console.log("Error in getUserIDByEmail controller" + error);
     throw new Error("Error in getUserIDByEmail controller: " + error);
   }
-}
+};
 
 const getEmailByUserID = async (userID) => {
   try {
@@ -89,7 +92,7 @@ const getEmailByUserID = async (userID) => {
     console.log("Error in getEmailByUserID controller" + error);
     throw new Error("Error in getEmailByUserID controller: " + error);
   }
-}
+};
 
 const getUsers = async () => {
   try {
@@ -98,7 +101,7 @@ const getUsers = async () => {
     console.log("Error in getUsers controller" + error);
     throw new Error("Error in getUsers controller: " + error);
   }
-}
+};
 
 const updateEmail = async (currentEmail, newEmail) => {
   try {
@@ -114,13 +117,15 @@ const updateEmail = async (currentEmail, newEmail) => {
     console.log("Error in updateEmail controller" + error);
     throw new Error("Error in updateEmail controller: " + error);
   }
-}
+};
 
 const updatePassword = async (email, newPassword) => {
   try {
+    const salt = await bcrypt.genSalt(10);
+    const newPasswordHash = await bcrypt.hash(password, salt);
     const user = await getUser(email);
     if (user) {
-      user.passwordHash = newPassword;
+      user.passwordHash = newPasswordHash;
       await user.save();
       return true;
     } else {
@@ -130,12 +135,12 @@ const updatePassword = async (email, newPassword) => {
     console.log("Error in updatePassword controller" + error);
     throw new Error("Error in updatePassword controller: " + error);
   }
-}
+};
 
-const updateUsername = async (email, currentUsername, newUsername) => {
+const updateUsername = async (email, newUsername) => {
   try {
     const user = await getUser(email);
-    if (user && user.username === currentUsername) {
+    if (user) {
       user.username = newUsername;
       await user.save();
       return true;
@@ -146,7 +151,7 @@ const updateUsername = async (email, currentUsername, newUsername) => {
     console.log("Error in updateUsername controller" + error);
     throw new Error("Error in updateUsername controller: " + error);
   }
-}
+};
 
 module.exports = {
   createUser,
