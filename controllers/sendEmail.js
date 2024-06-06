@@ -5,6 +5,7 @@ dotenv.config({ path: `${__dirname}/.env` });
 const transporter = nodemailer.createTransport("SMTP", {
   host: process.env.SMTP_HOST,
   port: parseInt(process.env.SMTP_PORT, 10),
+  service: "Outlook",
   secure: false,
   auth: {
     user: process.env.SMTP_MAIL,
