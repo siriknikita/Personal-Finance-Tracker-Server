@@ -2,10 +2,10 @@ const nodemailer = require("nodemailer");
 const dotenv = require("dotenv");
 dotenv.config({ path: `${__dirname}/.env` });
 
-const transporter = nodemailer.createTransport("SMTP", {
+const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: parseInt(process.env.SMTP_PORT, 10),
-  service: "Outlook",
+  service: "outlook",
   secure: false,
   auth: {
     user: process.env.SMTP_MAIL,
@@ -17,9 +17,6 @@ const transporter = nodemailer.createTransport("SMTP", {
 });
 
 async function sendGreetingEmail(recipientEmail) {
-  console.log("Sending email to:", recipientEmail);
-  console.log("User:", process.env.SMTP_MAIL);
-  console.log("Password:", process.env.SMTP_PASSWORD);
   try {
     const info = await transporter.sendMail({
       from: process.env.SMTP_MAIL,
