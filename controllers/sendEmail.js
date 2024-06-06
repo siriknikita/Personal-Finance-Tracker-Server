@@ -2,23 +2,22 @@ const nodemailer = require("nodemailer");
 require("dotenv").config();
 
 const transporter = nodemailer.createTransport({
-  service: "outlook",
-  host: "smtp-mail.outlook.com",
-  port: 587,
-  secure: false,
+  host: process.env.SMTP_HOST,
+  port: parseInt(process.env.SMTP_PORT, 10),
+  service: process.env.SMTP_SERVICE,
   auth: {
-    user: process.env.NODEMAILER_USER,
-    pass: process.env.NODEMAILER_PASSWORD,
+    user: process.env.SMTP_MAIL,
+    pass: process.env.SMTP_PASSWORD,
   },
 });
 
 async function sendGreetingEmail(recipientEmail) {
   console.log("Sending email to:", recipientEmail);
-  console.log("User:", process.env.NODEMAILER_USER);
-  console.log("Password:", process.env.NODEMAILER_PASSWORD);
+  console.log("User:", process.env.SMTP_MAIL);
+  console.log("Password:", process.env.SMTP_PASSWORD);
   try {
     const info = await transporter.sendMail({
-      from: process.env.NODEMAILER_USER,
+      from: process.env.SMTP_MAIL,
       to: recipientEmail,
       subject: "Welcome email",
       text: "You registered successfully.",
@@ -35,8 +34,8 @@ async function sendSupportEmail(req, res) {
 
   try {
     await transporter.sendMail({
-      from: process.env.NODEMAILER_USER,
-      to: process.env.NODEMAILER_PFT_SUPPORT_EMAIL,
+      from: process.env.SMTP_MAIL,
+      to: process.env.SMTP_SUPPORT_EMAIL,
       subject: "Support Message | PFT",
       text: issueDescription,
       html:
@@ -63,8 +62,8 @@ async function sendFeedbackEmail(req, res) {
 
   try {
     await transporter.sendMail({
-      from: process.env.NODEMAILER_USER,
-      to: process.env.NODEMAILER_PFT_SUPPORT_EMAIL,
+      from: process.env.SMTP_MAIL,
+      to: process.env.SMTP_SUPPORT_EMAIL,
       subject: "Feedback Message | PFT",
       text: feedback,
       html:
@@ -96,12 +95,11 @@ async function sendBudgetLimitExceededEmail(email) {
 
   try {
     await transporter.sendMail({
-      from: process.env.NODEMAILER_USER,
+      from: process.env.SMTP_MAIL,
       to: email,
       subject: "Budget Limit Exceeded",
       text: "You have exceeded your monthly limit.",
-      html:
-        `<p>Hey! You have exceeded your monthly limit by $${exceededAmount}. Your monthly limit is $${monthlyLimit}.</p>`
+      html: `<p>Hey! You have exceeded your monthly limit by $${exceededAmount}. Your monthly limit is $${monthlyLimit}.</p>`,
     });
   } catch (error) {
     console.error("Error sending email:", error);
