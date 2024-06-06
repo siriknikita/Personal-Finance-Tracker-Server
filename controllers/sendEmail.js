@@ -2,13 +2,16 @@ const nodemailer = require("nodemailer");
 const dotenv = require("dotenv");
 dotenv.config({ path: `${__dirname}/.env` });
 
-const transporter = nodemailer.createTransport({
+const transporter = nodemailer.createTransport("SMTP", {
   host: process.env.SMTP_HOST,
   port: parseInt(process.env.SMTP_PORT, 10),
-  service: process.env.SMTP_SERVICE,
+  secure: false,
   auth: {
     user: process.env.SMTP_MAIL,
     pass: process.env.SMTP_PASSWORD,
+  },
+  tls: {
+    ciphers: "SSLv3",
   },
 });
 
