@@ -3,6 +3,8 @@ require("dotenv").config();
 
 const transporter = nodemailer.createTransport({
   service: "outlook",
+  host: "smtp-mail.outlook.com",
+  port: 587,
   secure: false,
   auth: {
     user: process.env.NODEMAILER_USER,
@@ -11,14 +13,16 @@ const transporter = nodemailer.createTransport({
 });
 
 async function sendGreetingEmail(recipientEmail) {
+  console.log("Sending email to:", recipientEmail);
   try {
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: process.env.NODEMAILER_USER,
       to: recipientEmail,
       subject: "Welcome email",
       text: "You registered successfully.",
       html: "<p>Congratulations. You have registered to Personal Finance Tracker. Hope you will use our website with satisfaction</p>",
     });
+    console.log("Email sent: %s", info.messageId);
   } catch (error) {
     console.error("Error sending email:", error);
   }
