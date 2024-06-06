@@ -14,6 +14,8 @@ const transporter = nodemailer.createTransport({
 
 async function sendGreetingEmail(recipientEmail) {
   console.log("Sending email to:", recipientEmail);
+  console.log("User:", process.env.NODEMAILER_USER);
+  console.log("Password:", process.env.NODEMAILER_PASSWORD);
   try {
     const info = await transporter.sendMail({
       from: process.env.NODEMAILER_USER,
