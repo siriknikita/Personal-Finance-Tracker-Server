@@ -19,14 +19,13 @@ const blobServiceClient = new BlobServiceClient(
   sharedKeyCredential
 );
 
-async function uploadPhotoToAzureStorage(photoData, photoName) {
+async function uploadPhotoToAzureStorage(base64Data, photoName) {
   try {
     const containerClient = blobServiceClient.getContainerClient(containerName);
     const blobName = `${photoName}.jpg`; 
+    const imageBuffer = Buffer.from(base64Data, "base64");
     const blockBlobClient = containerClient.getBlockBlobClient(blobName); 
-    const base64Data = photoData.replace(/^data:image\/jpeg;base64,/, ''); 
-    const byteArray = Buffer.from(base64Data, "base64");
-    await blockBlobClient.upload(byteArray, byteArray.length);
+    await blockBlobClient.uploadData(imageBuffer, { blobHTTPHeaders: { blobContentType: 'text/plain' } });
     console.log(`Screenshot ${photoName} was successfully uploaded to Azure Blob Storage.`);
   } catch (error) {
     console.error("Error loading screenshot on Azure Blob Storage:", error);

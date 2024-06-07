@@ -7,7 +7,7 @@ router.use(express.json());
 
 /**
  * @swagger
- * /api/feedback:
+ * /api/email/feedback:
  *   post:
  *     summary: Send feedback email
  *     tags: [Feedback]
