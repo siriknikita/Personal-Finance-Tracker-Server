@@ -40,7 +40,7 @@ async function sendFeedbackEmail(feedback, userEmail) {
       subject: "Feedback Message | PFT",
       text: feedback,
       html:
-        "<h2>Hey! I am" +
+        "<h2>Hey! I am " +
         userEmail +
         ". I have some feedback for you:</h2><p>" +
         feedback +
