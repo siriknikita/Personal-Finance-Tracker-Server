@@ -57,6 +57,7 @@ const userRoutes = require("./routes/user.route");
 const transactionsRoutes = require("./routes/transactions.route");
 const adminRoutes = require("./routes/admin.route");
 const categoryRoutes = require("./routes/category.route");
+const emailRoutes = require("./routes/email.route.js");
 const blobRoutes = require("./routes/blobStorage.route");
 const { cookieJWTAuth } = require("./middleware/cookieJWTAuth");
 
@@ -66,6 +67,7 @@ app.use("/api/goals", cookieJWTAuth, goalsRoutes);
 app.use("/api/user", cookieJWTAuth, userRoutes);
 app.use("/api/categories", cookieJWTAuth, categoryRoutes);
 app.use("/api/transactions", cookieJWTAuth, transactionsRoutes);
+app.use("/api/email", cookieJWTAuth, emailRoutes);
 app.use("/api/admin", cookieJWTAuth, adminRoutes);
 app.use("/api/blob", cookieJWTAuth, blobRoutes);
 

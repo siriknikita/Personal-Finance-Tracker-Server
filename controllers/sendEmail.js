@@ -32,39 +32,9 @@ async function sendGreetingEmail(recipientEmail) {
   }
 }
 
-async function sendSupportEmail(req, res) {
-  const { issueDescription, userEmail } = req.body;
-
+async function sendFeedbackEmail(feedback, userEmail) {
   try {
-    await transporter.sendMail({
-      from: process.env.SMTP_MAIL,
-      to: process.env.SMTP_SUPPORT_EMAIL,
-      subject: "Support Message | PFT",
-      text: issueDescription,
-      html:
-        "<h2>Hey! I am" +
-        userEmail +
-        ". I need your help. I have the following problem:</h2><p>" +
-        issueDescription +
-        "</p><h3>Please, help me solve the problem.</h3>",
-    });
-
-    return res
-      .status(200)
-      .send({ message: "Support email has been successfully sended" });
-  } catch (error) {
-    console.error("Error sending email:", error);
-    return res
-      .status(400)
-      .send({ message: "Error sending while sending support email" });
-  }
-}
-
-async function sendFeedbackEmail(req, res) {
-  const { feedback, userEmail } = req.body;
-
-  try {
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: process.env.SMTP_MAIL,
       to: process.env.SMTP_SUPPORT_EMAIL,
       subject: "Feedback Message | PFT",
@@ -76,10 +46,7 @@ async function sendFeedbackEmail(req, res) {
         feedback +
         "</p>",
     });
-
-    return res
-      .status(200)
-      .send({ message: "Feedback email has been successfully sended" });
+    console.log("Feedback email has been successfully sended: %s", info.messageId);
   } catch (error) {
     console.error("Error sending email:", error);
     return res
@@ -111,7 +78,6 @@ async function sendBudgetLimitExceededEmail(email) {
 
 module.exports = {
   sendGreetingEmail,
-  sendSupportEmail,
   sendFeedbackEmail,
   sendBudgetLimitExceededEmail,
 };
