@@ -52,8 +52,16 @@ router.use(express.json());
 router.post("/feedback", async (req, res) => {
   try {
     const { sendFeedbackEmail } = require("../controllers/sendEmail");
-    const { feedback, userEmail } = req.body;
-    await sendFeedbackEmail(feedback, userEmail);
+    const { feedback, userEmail, hasPhoto, filename } = req.body;
+    if (hasPhoto) {
+      // wait half a second to allow the image to be uploaded to Azure
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      const { sendScreenshotEmail } = require("../controllers/sendEmail");
+      await sendScreenshotEmail(feedback, userEmail, filename);
+    } else {
+      await sendFeedbackEmail(feedback, userEmail);
+    }
     res
       .status(200)
       .json({ message: "Feedback email has been successfully sent" });

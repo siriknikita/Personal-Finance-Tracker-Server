@@ -46,7 +46,10 @@ async function sendFeedbackEmail(feedback, userEmail) {
         feedback +
         "</p>",
     });
-    console.log("Feedback email has been successfully sended: %s", info.messageId);
+    console.log(
+      "Feedback email has been successfully sended: %s",
+      info.messageId
+    );
   } catch (error) {
     console.error("Error sending email:", error);
     return res
@@ -76,8 +79,47 @@ async function sendBudgetLimitExceededEmail(email) {
   }
 }
 
+async function sendScreenshotEmail(feedback, userEmail, filename) {
+  try {
+    const { fetchImageAsBuffer } = require("../azureStorage");
+    const blobUrl = await fetchImageAsBuffer(
+      process.env.AZURE_STORAGE_CONTAINER_NAME,
+      filename + ".jpg",
+    );
+    const base64Data = blobUrl.toString("base64");
+    const blobBuffer = `data:image/jpeg;base64,${base64Data}`;
+
+    const info = await transporter.sendMail({
+      from: process.env.SMTP_MAIL,
+      to: process.env.SMTP_SUPPORT_EMAIL,
+      subject: "Feedback Message | PFT",
+      text: feedback,
+      html:
+        "<h2>Hey! I am " +
+        userEmail +
+        ". I have some feedback for you:</h2><p>" +
+        feedback +
+        "</p><p>Attached is the screenshot of the feedback</p>",
+      attachments: [
+        {
+          filename: filename,
+          path: blobBuffer,
+        },
+      ],
+    });
+    console.log(
+      "Feedback email has been successfully sended: %s",
+      info.messageId
+    );
+  } catch (error) {
+    console.error("Error sending email:", error);
+  }
+}
+
 module.exports = {
+  transporter,
   sendGreetingEmail,
   sendFeedbackEmail,
   sendBudgetLimitExceededEmail,
+  sendScreenshotEmail,
 };
