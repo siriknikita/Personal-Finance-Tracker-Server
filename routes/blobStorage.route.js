@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const bodyParser = require("body-parser");
 const { uploadPhotoToAzureStorage } = require("../azureStorage");
-const moment = require("moment");
 const multer = require("multer");
 const upload = multer({ storage: multer.memoryStorage() });
 
