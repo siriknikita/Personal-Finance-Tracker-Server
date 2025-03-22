@@ -2,6 +2,7 @@ const { Transaction, Category } = require("../models");
 const { budgetController, categoryController } = require("../controllers");
 const moment = require("moment");
 const momentTimezone = require("moment-timezone");
+const { Sequelize } = require("sequelize");
 
 const getTransactionCategoriesIDByUserID = async (userID) => {
   try {
@@ -13,10 +14,10 @@ const getTransactionCategoriesIDByUserID = async (userID) => {
     return transactions.map((transaction) => transaction.categoryID);
   } catch (error) {
     console.log(
-      "Erorr in getTransactionCategoriesIDByUserID controller:" + error
+      "Erorr in getTransactionCategoriesIDByUserID controller:" + error,
     );
     throw new Error(
-      "Error in getTransactionCategoriesIDByUserID: controller: " + error
+      "Error in getTransactionCategoriesIDByUserID: controller: " + error,
     );
   }
 };
@@ -37,7 +38,7 @@ const getCategoryNameByID = async (categoryID) => {
 const getTransactionCategoriesByUserID = async (userID) => {
   const categoriesID = await getTransactionCategoriesIDByUserID(userID);
   const categoriesList = await Promise.all(
-    categoriesID.map(getCategoryNameByID)
+    categoriesID.map(getCategoryNameByID),
   );
   return categoriesList;
 };
@@ -53,7 +54,7 @@ const getTransactionMoneyByUserID = async (userID) => {
   } catch (error) {
     console.log("Error in getTransactionMoneyByUserID controller: " + error);
     throw new Error(
-      "Error in getTransactionMoneyByUserID controller: " + error
+      "Error in getTransactionMoneyByUserID controller: " + error,
     );
   }
 };
@@ -113,7 +114,7 @@ const updateTotalMoneySpentByUserID = async (userID, amount) => {
   } catch (error) {
     console.log("Error in updateTotalMoneySpentByUserID controller: " + error);
     throw new Error(
-      "Error in updateTotalMoneySpentByUserID controller: " + error
+      "Error in updateTotalMoneySpentByUserID controller: " + error,
     );
   }
 };
@@ -168,7 +169,7 @@ const getTop5CategoriesFrequencies = async () => {
   } catch (error) {
     console.log("Error in getTop5CategoriesFrequencies controller: " + error);
     throw new Error(
-      "Error in getTop5CategoriesFrequencies controller: " + error
+      "Error in getTop5CategoriesFrequencies controller: " + error,
     );
   }
 };
@@ -200,7 +201,7 @@ const getTotalUsersSpending = async () => {
       const moneySpent = await getMoneySpentByCategoryID(category.id);
       totalUsersSpending[category.name] = moneySpent.reduce(
         (acc, amount) => acc + amount,
-        0
+        0,
       );
     }
 
@@ -227,10 +228,10 @@ const getExpenseData = async (userID) => {
         expenseData[formattedDate] = transaction.amount;
       }
     });
-    
+
     return Object.entries(expenseData).map(([date, amount]) => ({
-      "x": date,
-      "y": amount,
+      x: date,
+      y: amount,
     }));
   } catch (error) {
     console.log("Error in getExpenseData controller: " + error);

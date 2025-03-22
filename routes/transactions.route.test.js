@@ -1,5 +1,6 @@
 const request = require("supertest");
 const app = require("../server");
+const { describe, it } = require("jest");
 
 describe("Transactions Route", () => {
   it("GET /api/transactions/get/{userID}", async () => {
@@ -11,7 +12,9 @@ describe("Transactions Route", () => {
   });
 
   it("GET /api/transactions/get/moneySpent/categories/{userID}", async () => {
-    await request(app).get("/api/transactions/get/moneySpent/categories/1").expect(401);
+    await request(app)
+      .get("/api/transactions/get/moneySpent/categories/1")
+      .expect(401);
   });
 
   it("GET /api/transactions/get/spendings/top5", async () => {
@@ -19,7 +22,9 @@ describe("Transactions Route", () => {
   });
 
   it("GET /api/transactions/get/categories/{userID}", async () => {
-    await request(app).get("/api/transactions/get/categories/{userID}").expect(401);
+    await request(app)
+      .get("/api/transactions/get/categories/{userID}")
+      .expect(401);
   });
 
   it("POST /api/transactions/add", async () => {

@@ -1,5 +1,6 @@
 const request = require("supertest");
 const app = require("../server");
+const { describe, it } = require("jest");
 
 describe("User Route", () => {
   it("GET /api/user/get/{email}", async () => {

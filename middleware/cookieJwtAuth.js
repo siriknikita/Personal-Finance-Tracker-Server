@@ -11,6 +11,7 @@ exports.cookieJWTAuth = (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
+    console.error("Error in cookieJWTAuth: ", error);
     res.clearCookie("token");
     res.status(401).send("Unauthorized");
   }

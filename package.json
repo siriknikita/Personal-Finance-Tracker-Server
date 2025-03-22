@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node server",
     "dev": "nodemon server",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "test": "jest --coverage"
   },
   "keywords": [],
@@ -37,6 +39,11 @@
     "typescript": "^5.4.5"
   },
   "devDependencies": {
+    "@eslint/js": "^9.23.0",
+    "eslint": "^9.23.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.31.0",
+    "globals": "^16.0.0",
     "jest-fetch-mock": "^3.0.3",
     "nodemon": "^3.1.0"
   }

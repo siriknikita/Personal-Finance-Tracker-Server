@@ -48,13 +48,11 @@ async function sendFeedbackEmail(feedback, userEmail) {
     });
     console.log(
       "Feedback email has been successfully sended: %s",
-      info.messageId
+      info.messageId,
     );
   } catch (error) {
     console.error("Error sending email:", error);
-    return res
-      .status(400)
-      .send({ message: "Error sending while sending feedback email" });
+    return { message: `Error sending while sending feedback email: ${error}` };
   }
 }
 
@@ -109,7 +107,7 @@ async function sendScreenshotEmail(feedback, userEmail, filename) {
     });
     console.log(
       "Feedback email has been successfully sended: %s",
-      info.messageId
+      info.messageId,
     );
   } catch (error) {
     console.error("Error sending email:", error);

@@ -19,19 +19,23 @@ jobs:
       - name: Set up Node.js version
         uses: actions/setup-node@v1
         with:
-          node-version: '18.x'
+          node-version: "18.x"
 
-      - name: npm install, build, and test
-        run: |
-          npm install
-          npm run build --if-present
+      - name: npm install
+        run: npm install
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: npm run build
+        run: npm run build --if-present
 
       - name: Zip Release
         uses: TheDoctor0/zip-release@0.6.1
         with:
           filename: release.zip
           path: ./*
-      
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
         with:
@@ -42,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     environment:
-      name: 'Production'
+      name: "Production"
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
@@ -51,11 +55,11 @@ jobs:
         with:
           name: node-app
 
-      - name: 'Deploy to Azure Web App'
+      - name: "Deploy to Azure Web App"
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'personal-finance-tracker-server'
-          slot-name: 'Production'
+          app-name: "personal-finance-tracker-server"
+          slot-name: "Production"
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_ED30A67B7E6B47ED9FDB8EF4A81588AC }}
           package: release.zip

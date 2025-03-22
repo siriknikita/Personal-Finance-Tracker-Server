@@ -50,7 +50,7 @@ const loginUser = async (email, password, isGoogle = false) => {
     if (!isGoogle) {
       const passwordMatch = await bcrypt.compare(
         password,
-        userData.dataValues.passwordHash
+        userData.dataValues.passwordHash,
       );
       if (!passwordMatch) {
         return null;
@@ -119,7 +119,7 @@ const updateEmail = async (currentEmail, newEmail) => {
   }
 };
 
-const updatePassword = async (email, newPassword) => {
+const updatePassword = async (email, password) => {
   try {
     const salt = await bcrypt.genSalt(10);
     const newPasswordHash = await bcrypt.hash(password, salt);

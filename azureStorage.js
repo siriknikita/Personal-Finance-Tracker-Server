@@ -1,6 +1,7 @@
 const {
   BlobServiceClient,
   StorageSharedKeyCredential,
+  Buffer,
 } = require("@azure/storage-blob");
 
 require("dotenv").config();
@@ -11,14 +12,14 @@ const containerName = process.env.AZURE_STORAGE_CONTAINER_NAME;
 
 if (!account || !accountKey || !containerName) {
   throw new Error(
-    "Azure Storage account name, account key, and container name must be set in environment variables"
+    "Azure Storage account name, account key, and container name must be set in environment variables",
   );
 }
 
 const sharedKeyCredential = new StorageSharedKeyCredential(account, accountKey);
 const blobServiceClient = new BlobServiceClient(
   `https://${account}.blob.core.windows.net`,
-  sharedKeyCredential
+  sharedKeyCredential,
 );
 
 async function uploadPhotoToAzureStorage(base64Data, photoName) {
@@ -31,7 +32,7 @@ async function uploadPhotoToAzureStorage(base64Data, photoName) {
       blobHTTPHeaders: { blobContentType: "text/plain" },
     });
     console.log(
-      `Screenshot ${photoName} was successfully uploaded to Azure Blob Storage.`
+      `Screenshot ${photoName} was successfully uploaded to Azure Blob Storage.`,
     );
   } catch (error) {
     console.error("Error loading screenshot on Azure Blob Storage:", error);
@@ -43,21 +44,23 @@ async function fetchImageAsBuffer(containerName, blobName) {
   const containerClient = blobServiceClient.getContainerClient(containerName);
   const blockBlobClient = containerClient.getBlockBlobClient(blobName);
   const downloadBlockBlobResponse = await blockBlobClient.download(0);
-  const downloaded = await streamToBuffer(downloadBlockBlobResponse.readableStreamBody);
+  const downloaded = await streamToBuffer(
+    downloadBlockBlobResponse.readableStreamBody,
+  );
 
   return downloaded;
 }
 
 async function streamToBuffer(readableStream) {
   return new Promise((resolve, reject) => {
-      const chunks = [];
-      readableStream.on("data", (data) => {
-          chunks.push(data instanceof Buffer ? data : Buffer.from(data));
-      });
-      readableStream.on("end", () => {
-          resolve(Buffer.concat(chunks));
-      });
-      readableStream.on("error", reject);
+    const chunks = [];
+    readableStream.on("data", (data) => {
+      chunks.push(data instanceof Buffer ? data : Buffer.from(data));
+    });
+    readableStream.on("end", () => {
+      resolve(Buffer.concat(chunks));
+    });
+    readableStream.on("error", reject);
   });
 }
 
